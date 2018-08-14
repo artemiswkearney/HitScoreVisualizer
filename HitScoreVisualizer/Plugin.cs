@@ -9,7 +9,12 @@ namespace HitScoreVisualizer
     public class Plugin : IPlugin
     {
         public string Name => "HitScoreVisualizer";
-        public string Version => "1.0.0";
+        public string Version => "2.0.0";
+
+        internal const int majorVersion = 2;
+        internal const int minorVersion = 0;
+        internal const int patchVersion = 0;
+
         public void OnApplicationStart()
         {
             SceneManager.activeSceneChanged += SceneManagerOnActiveSceneChanged;
@@ -25,6 +30,7 @@ namespace HitScoreVisualizer
                     "installed the plugin properly, as the Harmony DLL should have been installed with it.");
                 Console.WriteLine(e);
             }
+            Config.load();
         }
 
         private void SceneManagerOnActiveSceneChanged(Scene arg0, Scene arg1)
@@ -56,6 +62,13 @@ namespace HitScoreVisualizer
 
         public void OnFixedUpdate()
         {
+        }
+
+        internal static void log(object message)
+        {
+#if DEBUG
+            Console.WriteLine("[HitScoreVisualizer] " + message);
+#endif
         }
     }
 }
