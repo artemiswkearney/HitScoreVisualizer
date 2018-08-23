@@ -74,7 +74,7 @@ namespace HitScoreVisualizer
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
   ""minorVersion"": 0,
-  ""patchVersion"": 0,
+  ""patchVersion"": 2,
   ""isDefaultConfig"": true,
   ""displayMode"": ""textOnTop"",
   ""judgments"": [
@@ -227,7 +227,6 @@ namespace HitScoreVisualizer
         {
             if (config.majorVersion < Plugin.majorVersion) return true;
             if (config.minorVersion < Plugin.minorVersion) return true;
-            if (config.patchVersion < Plugin.patchVersion) return true;
             return false;
         }
 
@@ -246,24 +245,28 @@ namespace HitScoreVisualizer
         public static void judge(FlyingScoreTextEffect text, ref Color color, int score)
         {
             Judgment judgment = DEFAULT_JUDGMENT;
-            Judgment fadeJudgment = DEFAULT_JUDGMENT;
-            for (int i = 0; i < instance.judgments.Length; i++)
+            int index; // save in case we need to fade
+            for (index = 0; index < instance.judgments.Length; index++)
             {
-                Judgment j = instance.judgments[i];
+                Judgment j = instance.judgments[index];
                 if (score >= j.threshold)
                 {
-                    if (j.fade) fadeJudgment = instance.judgments[i-1];
-                    else fadeJudgment = j;
-
                     judgment = j;
                     break;
                 }
             }
-
-            Color baseColor = toColor(judgment.color);
-            Color fadeColor = toColor(fadeJudgment.color);
-            float lerpDistance = Mathf.InverseLerp(judgment.threshold, fadeJudgment.threshold, score);
-            color = Color.Lerp(baseColor, fadeColor, lerpDistance);
+            if (judgment.fade)
+            {
+                Judgment fadeJudgment = instance.judgments[index - 1];
+                Color baseColor = toColor(judgment.color);
+                Color fadeColor = toColor(fadeJudgment.color);
+                float lerpDistance = Mathf.InverseLerp(judgment.threshold, fadeJudgment.threshold, score);
+                color = Color.Lerp(baseColor, fadeColor, lerpDistance);
+            }
+            else
+            {
+                color = toColor(judgment.color);
+            }
 
             if (instance.displayMode == "textOnly")
             {
