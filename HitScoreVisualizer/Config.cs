@@ -43,6 +43,17 @@ namespace HitScoreVisualizer
             public bool fade;
         }
 
+        // Judgments for individual parts of the swing (angle before, angle after, accuracy).
+        public struct SegmentJudgment
+        {
+            // This judgment will be applied only when the appropriate part of the swing contributes score >= this number.
+            // If no judgment can be applied, the judgment for this segment will be "" (the empty string).
+            [DefaultValue(0)]
+            public int threshold;
+            // The text to replace the appropriate judgment specifier with (%B, %C, %A) when this judgment applies.
+            public string text;
+        }
+
         // If the version number (excluding patch version) of the config is higher than that of the plugin,
         // the config will not be loaded. If the version number of the config is lower than that of the
         // plugin, the file will be automatically converted. Conversion is not guaranteed to occur, or be
@@ -58,6 +69,15 @@ namespace HitScoreVisualizer
         // update rather than being converted.
         public bool isDefaultConfig;
 
+        // If set to "format", displays the judgment text, with the following format specifiers allowed:
+        // - %b: The score contributed by the part of the swing before cutting the block.
+        // - %c: The score contributed by the accuracy of the cut.
+        // - %a: The score contributed by the part of the swing after cutting the block.
+        // - %B, %C, %A: As above, except using the appropriate judgment from that part of the swing (as configured for "beforeCutAngleJudgments", "accuracyJudgments", or "afterCutAngleJudgments").
+        // - %s: The total score for the cut.
+        // - %%: A literal percent symbol.
+        // - %n: A newline.
+        //
         // If set to "numeric", displays only the note score.
         // If set to "textOnly", displays only the judgment text.
         // If set to "scoreOnTop", displays both (numeric score above judgment text).
@@ -68,19 +88,30 @@ namespace HitScoreVisualizer
         // Order from highest threshold to lowest; the first matching judgment will be applied
         public Judgment[] judgments;
 
+        // Judgments for the part of the swing before cutting the block (score is from 0-70).
+        // Format specifier: %B
+        public SegmentJudgment[] beforeCutAngleJudgments;
+
+        // Judgments for the accuracy of the cut (how close to the center of the block the cut was, score is from 0-10).
+        // Format specifier: %C
+        public SegmentJudgment[] accuracyJudgments;
+
+        // Judgments for the part of the swing after cutting the block (score is from 0-30).
+        // Format specifier: %A
+        public SegmentJudgment[] afterCutAngleJudgments;
+
         // path to where the config is saved
         private const string FILE_PATH = "/UserData/HitScoreVisualizerConfig.json";
 
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
-  ""minorVersion"": 0,
-  ""patchVersion"": 2,
-  ""isDefaultConfig"": true,
-  ""displayMode"": ""textOnTop"",
+  ""minorVersion"": 1,
+  ""patchVersion"": 0,
+  ""displayMode"": ""format"",
   ""judgments"": [
     {
       ""threshold"": 110,
-      ""text"": ""Fantastic"",
+      ""text"": ""Fantastic%n%s%n%B %C %A"",
       ""color"": [
         1.0,
         1.0,
@@ -90,7 +121,7 @@ namespace HitScoreVisualizer
     },
     {
       ""threshold"": 101,
-      ""text"": ""<size=80%>Excellent</size>"",
+      ""text"": ""<size=80%>Excellent</size>%n%s%n%B %C %A"",
       ""color"": [
         0.0,
         1.0,
@@ -100,7 +131,7 @@ namespace HitScoreVisualizer
 },
     {
       ""threshold"": 90,
-      ""text"": ""<size=80%>Great</size>"",
+      ""text"": ""<size=80%>Great</size>%n%s%n%B %C %A"",
       ""color"": [
         1.0,
         0.980392158,
@@ -110,7 +141,7 @@ namespace HitScoreVisualizer
     },
     {
       ""threshold"": 80,
-      ""text"": ""<size=80%>Good</size>"",
+      ""text"": ""<size=80%>Good</size>%n%s%n%B %C %A"",
       ""color"": [
         1.0,
         0.6,
@@ -121,7 +152,7 @@ namespace HitScoreVisualizer
     },
     {
       ""threshold"": 60,
-      ""text"": ""<size=80%>Decent</size>"",
+      ""text"": ""<size=80%>Decent</size>%n%s%n%B %C %A"",
       ""color"": [
         1.0,
         0.0,
@@ -131,7 +162,7 @@ namespace HitScoreVisualizer
       ""fade"": true
     },
     {
-      ""text"": ""<size=80%>Way Off</size>"",
+      ""text"": ""<size=80%>Way Off</size>%n%s%n%B %C %A"",
       ""color"": [
         0.5,
         0.0,
@@ -139,6 +170,48 @@ namespace HitScoreVisualizer
         1.0
       ],
       ""fade"": true
+    }
+  ],
+  ""beforeCutAngleJudgments"": [
+    {
+	  ""threshold"": 70,
+      ""text"": ""+""
+    },
+    {
+	  ""threshold"": 35,
+      ""text"": ""  ""
+    },
+    {
+	  ""threshold"": 0,
+      ""text"": ""-""
+    }
+  ],
+  ""accuracyJudgments"": [
+    {
+	  ""threshold"": 10,
+      ""text"": ""+""
+    },
+    {
+	  ""threshold"": 5,
+      ""text"": ""  ""
+    },
+    {
+	  ""threshold"": 0,
+      ""text"": ""-""
+    }
+  ],
+  ""afterCutAngleJudgments"": [
+    {
+	  ""threshold"": 30,
+      ""text"": ""+""
+    },
+    {
+	  ""threshold"": 15,
+      ""text"": ""  ""
+    },
+    {
+	  ""threshold"": 0,
+      ""text"": ""-""
     }
   ]
 }";
@@ -151,6 +224,12 @@ namespace HitScoreVisualizer
             text = "",
             color = new float[] { 1f, 1f, 1f, 1f },
             fade = false
+        };
+
+        public static readonly SegmentJudgment DEFAULT_SEGMENT_JUDGMENT = new SegmentJudgment
+        {
+            threshold = 0,
+            text = ""
         };
 
         public static string fullPath => Environment.CurrentDirectory.Replace('\\', '/') + FILE_PATH;
@@ -180,7 +259,25 @@ namespace HitScoreVisualizer
             }
             if (outdated(loaded))
             {
+                if (loaded.isDefaultConfig)
+                {
+                    loaded = DEFAULT_CONFIG;
+                    instance = loaded;
+                    save();
+                    return;
+                }
                 // put config update logic here
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 0)
+                {
+                    loaded.beforeCutAngleJudgments = new SegmentJudgment[] { DEFAULT_SEGMENT_JUDGMENT };
+                    loaded.accuracyJudgments = new SegmentJudgment[] { DEFAULT_SEGMENT_JUDGMENT };
+                    loaded.afterCutAngleJudgments = new SegmentJudgment[] { DEFAULT_SEGMENT_JUDGMENT };
+                    loaded.minorVersion = 1;
+                    loaded.patchVersion = 0;
+                    instance = loaded;
+                    save();
+                    return;
+                }
             }
             instance = loaded;
         }
@@ -242,7 +339,7 @@ namespace HitScoreVisualizer
             instance = DEFAULT_CONFIG;
         }
 
-        public static void judge(FlyingScoreTextEffect text, ref Color color, int score)
+        public static void judge(FlyingScoreTextEffect text, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, ref Color color, int score)
         {
             Judgment judgment = DEFAULT_JUDGMENT;
             int index; // save in case we need to fade
@@ -268,6 +365,74 @@ namespace HitScoreVisualizer
                 color = toColor(judgment.color);
             }
 
+            if (instance.displayMode == "format")
+            {
+                int beforeCutScore, accuracyScore, afterCutScore;
+
+                beforeCutScore = Mathf.RoundToInt(70f * noteCutInfo.swingRating);
+                float accuracy = 1f - Mathf.Clamp01(noteCutInfo.cutDistanceToCenter / 0.2f);
+                accuracyScore = Mathf.RoundToInt(10f * accuracy);
+                afterCutScore = 0;
+                if (saberAfterCutSwingRatingCounter != null)
+                {
+                    afterCutScore = Mathf.RoundToInt(30f * saberAfterCutSwingRatingCounter.rating);
+                }
+
+                StringBuilder formattedBuilder = new StringBuilder();
+                string formatString = judgment.text;
+                int nextPercentIndex = formatString.IndexOf('%');
+                while (nextPercentIndex != -1)
+                {
+                    formattedBuilder.Append(formatString.Substring(0, nextPercentIndex));
+                    if (formatString.Length == nextPercentIndex + 1)
+                    {
+                        formatString += " ";
+                    }
+                    char specifier = formatString[nextPercentIndex + 1];
+
+                    switch (specifier)
+                    {
+                        case 'b':
+                            formattedBuilder.Append(beforeCutScore);
+                            break;
+                        case 'c':
+                            formattedBuilder.Append(accuracyScore);
+                            break;
+                        case 'a':
+                            formattedBuilder.Append(afterCutScore);
+                            break;
+                        case 'B':
+                            formattedBuilder.Append(judgeSegment(beforeCutScore, instance.beforeCutAngleJudgments));
+                            break;
+                        case 'C':
+                            formattedBuilder.Append(judgeSegment(accuracyScore, instance.accuracyJudgments));
+                            break;
+                        case 'A':
+                            formattedBuilder.Append(judgeSegment(afterCutScore, instance.afterCutAngleJudgments));
+                            break;
+                        case 's':
+                            formattedBuilder.Append(score);
+                            break;
+                        case '%':
+                            formattedBuilder.Append("%");
+                            break;
+                        case 'n':
+                            formattedBuilder.Append("\n");
+                            break;
+                        default:
+                            formattedBuilder.Append("%" + specifier);
+                            break;
+                    }
+
+                    formatString = formatString.Remove(0, nextPercentIndex + 2);
+                    nextPercentIndex = formatString.IndexOf('%');
+                }
+                formattedBuilder.Append(formatString);
+
+                text.text = formattedBuilder.ToString();
+                return;
+            }
+
             if (instance.displayMode == "textOnly")
             {
                 text.text = judgment.text;
@@ -288,6 +453,16 @@ namespace HitScoreVisualizer
         public static Color toColor(float[] rgba)
         {
             return new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
+        }
+
+        public static string judgeSegment(int scoreForSegment, SegmentJudgment[] judgments)
+        {
+            if (judgments == null) return "";
+            foreach(SegmentJudgment j in judgments)
+            {
+                if (scoreForSegment >= j.threshold) return j.text;
+            }
+            return "";
         }
     }
 }

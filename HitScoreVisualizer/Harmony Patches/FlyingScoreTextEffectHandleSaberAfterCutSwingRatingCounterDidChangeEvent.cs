@@ -16,7 +16,7 @@ namespace HitScoreVisualizer.Harmony_Patches
         {
             ScoreController.ScoreWithoutMultiplier(____noteCutInfo, afterCutRating, out int before, out int after);
             int total = before + after;
-            Config.judge(__instance, ref ____color, total);
+            Config.judge(__instance, ____noteCutInfo, afterCutRating, ref ____color, total);
             return false;
         }
     }
