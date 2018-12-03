@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace HitScoreVisualizer
 {
-    class Config
+    public class Config
     {
         public static Config instance;
 
@@ -339,7 +339,7 @@ namespace HitScoreVisualizer
             instance = DEFAULT_CONFIG;
         }
 
-        public static void judge(FlyingScoreTextEffect text, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, ref Color color, int score)
+        public static void judge(FlyingScoreTextEffect text, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, ref Color color, int score, int before, int after, int accuracy)
         {
             Judgment judgment = DEFAULT_JUDGMENT;
             int index; // save in case we need to fade
@@ -367,17 +367,6 @@ namespace HitScoreVisualizer
 
             if (instance.displayMode == "format")
             {
-                int beforeCutScore, accuracyScore, afterCutScore;
-
-                beforeCutScore = Mathf.RoundToInt(70f * noteCutInfo.swingRating);
-                float accuracy = 1f - Mathf.Clamp01(noteCutInfo.cutDistanceToCenter / 0.2f);
-                accuracyScore = Mathf.RoundToInt(10f * accuracy);
-                afterCutScore = 0;
-                if (saberAfterCutSwingRatingCounter != null)
-                {
-                    afterCutScore = Mathf.RoundToInt(30f * saberAfterCutSwingRatingCounter.rating);
-                }
-
                 StringBuilder formattedBuilder = new StringBuilder();
                 string formatString = judgment.text;
                 int nextPercentIndex = formatString.IndexOf('%');
@@ -393,22 +382,22 @@ namespace HitScoreVisualizer
                     switch (specifier)
                     {
                         case 'b':
-                            formattedBuilder.Append(beforeCutScore);
+                            formattedBuilder.Append(before);
                             break;
                         case 'c':
-                            formattedBuilder.Append(accuracyScore);
+                            formattedBuilder.Append(accuracy);
                             break;
                         case 'a':
-                            formattedBuilder.Append(afterCutScore);
+                            formattedBuilder.Append(after);
                             break;
                         case 'B':
-                            formattedBuilder.Append(judgeSegment(beforeCutScore, instance.beforeCutAngleJudgments));
+                            formattedBuilder.Append(judgeSegment(before, instance.beforeCutAngleJudgments));
                             break;
                         case 'C':
-                            formattedBuilder.Append(judgeSegment(accuracyScore, instance.accuracyJudgments));
+                            formattedBuilder.Append(judgeSegment(accuracy, instance.accuracyJudgments));
                             break;
                         case 'A':
-                            formattedBuilder.Append(judgeSegment(afterCutScore, instance.afterCutAngleJudgments));
+                            formattedBuilder.Append(judgeSegment(after, instance.afterCutAngleJudgments));
                             break;
                         case 's':
                             formattedBuilder.Append(score);

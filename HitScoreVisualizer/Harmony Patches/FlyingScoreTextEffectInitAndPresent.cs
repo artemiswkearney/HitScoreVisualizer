@@ -16,7 +16,6 @@ namespace HitScoreVisualizer.Harmony_Patches
             typeof(Vector3),
             typeof(Color),
             typeof(SaberAfterCutSwingRatingCounter)})]
-    */
     class FlyingScoreTextEffectInitAndPresent
     {
         static void Postfix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreTextEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
@@ -26,4 +25,5 @@ namespace HitScoreVisualizer.Harmony_Patches
             Config.judge(__instance, noteCutInfo, saberAfterCutSwingRatingCounter, ref ____color, total);
         }
     }
+    */
 }

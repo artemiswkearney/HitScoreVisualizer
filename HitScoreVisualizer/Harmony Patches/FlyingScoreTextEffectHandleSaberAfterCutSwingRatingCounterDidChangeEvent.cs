@@ -14,9 +14,9 @@ namespace HitScoreVisualizer.Harmony_Patches
     {
         static bool Prefix(SaberAfterCutSwingRatingCounter afterCutRating, FlyingScoreTextEffect __instance, ref Color ____color, NoteCutInfo ____noteCutInfo, int ____multiplier)
         {
-            ScoreController.ScoreWithoutMultiplier(____noteCutInfo, afterCutRating, out int before, out int after);
-            int total = before + after;
-            Config.judge(__instance, ____noteCutInfo, afterCutRating, ref ____color, total);
+            ScoreController.ScoreWithoutMultiplier(____noteCutInfo, afterCutRating, out int before_plus_acc, out int after, out int accuracy);
+            int total = before_plus_acc + after;
+            Config.judge(__instance, ____noteCutInfo, afterCutRating, ref ____color, total, before_plus_acc - accuracy, after, accuracy);
             return false;
         }
     }
