@@ -106,7 +106,8 @@ namespace HitScoreVisualizer
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
   ""minorVersion"": 1,
-  ""patchVersion"": 0,
+  ""patchVersion"": 2,
+  ""isDefaultConfig"": true,
   ""displayMode"": ""format"",
   ""judgments"": [
     {
@@ -267,6 +268,7 @@ namespace HitScoreVisualizer
                     return;
                 }
                 // put config update logic here
+                bool isDirty = false; // set to true if you modify the config
                 if (loaded.majorVersion == 2 && loaded.minorVersion == 0)
                 {
                     loaded.beforeCutAngleJudgments = new SegmentJudgment[] { DEFAULT_SEGMENT_JUDGMENT };
@@ -274,10 +276,14 @@ namespace HitScoreVisualizer
                     loaded.afterCutAngleJudgments = new SegmentJudgment[] { DEFAULT_SEGMENT_JUDGMENT };
                     loaded.minorVersion = 1;
                     loaded.patchVersion = 0;
-                    instance = loaded;
-                    save();
-                    return;
+                    isDirty = true;
                 }
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 1 && loaded.patchVersion < 2)
+                {
+                    loaded.patchVersion = 2;
+                    isDirty = true;
+                }
+                if (isDirty) save();
             }
             instance = loaded;
         }
