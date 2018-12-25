@@ -1,7 +1,7 @@
 ### Changelog
-2.0.2: Bug fixes and performance improvements. If you've been noticing lag, try disabling the fade option on all judgments in the config.
+2.0.2: Bug fixes and performance improvements. If you've been noticing lag, try disabling the fade option on all judgments in the config.  
 2.1.0: Added display mode "format" (see below).  
-2.1.2: Actually bump version number this time; minor fixes to default config
+2.1.2: Actually bump version number this time; minor fixes to default config  
 ***
 Colors the score popups that appear when hitting notes. Also adds judgment text above (or below) the score.
 
