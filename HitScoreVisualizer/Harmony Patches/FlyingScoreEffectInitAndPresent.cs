@@ -8,16 +8,17 @@ using UnityEngine;
 
 namespace HitScoreVisualizer.Harmony_Patches
 {
-    [HarmonyPatch(typeof(FlyingScoreTextEffect), "InitAndPresent",
+    [HarmonyPatch(typeof(FlyingScoreEffect), "InitAndPresent",
         new Type[] {
             typeof(NoteCutInfo),
             typeof(int),
+            typeof(float),
             typeof(Vector3),
             typeof(Color),
             typeof(SaberAfterCutSwingRatingCounter)})]
-    class FlyingScoreTextEffectInitAndPresent
+    class FlyingScoreEffectInitAndPresent
     {
-        static void Postfix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreTextEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
+        static void Postfix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
         {
             ScoreController.ScoreWithoutMultiplier(noteCutInfo, saberAfterCutSwingRatingCounter, out int before_plus_acc, out int after, out int accuracy);
             int total = before_plus_acc + after;

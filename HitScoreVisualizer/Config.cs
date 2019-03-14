@@ -6,7 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
+
+using static HitScoreVisualizer.Utils.ReflectionUtil;
 
 namespace HitScoreVisualizer
 {
@@ -106,13 +109,13 @@ namespace HitScoreVisualizer
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
   ""minorVersion"": 1,
-  ""patchVersion"": 3,
+  ""patchVersion"": 5,
   ""isDefaultConfig"": true,
   ""displayMode"": ""format"",
   ""judgments"": [
     {
       ""threshold"": 110,
-      ""text"": ""Fantastic%n%s%n%B %C %A"",
+      ""text"": ""%BFantastic%A%n%s"",
       ""color"": [
         1.0,
         1.0,
@@ -122,7 +125,7 @@ namespace HitScoreVisualizer
     },
     {
       ""threshold"": 101,
-      ""text"": ""<size=80%>Excellent</size>%n%s%n%B %C %A"",
+      ""text"": ""<size=80%>%BExcellent%A</size>%n%s"",
       ""color"": [
         0.0,
         1.0,
@@ -132,7 +135,7 @@ namespace HitScoreVisualizer
 },
     {
       ""threshold"": 90,
-      ""text"": ""<size=80%>Great</size>%n%s%n%B %C %A"",
+      ""text"": ""<size=80%>%BGreat%A</size>%n%s"",
       ""color"": [
         1.0,
         0.980392158,
@@ -142,7 +145,7 @@ namespace HitScoreVisualizer
     },
     {
       ""threshold"": 80,
-      ""text"": ""<size=80%>Good</size>%n%s%n%B %C %A"",
+      ""text"": ""<size=80%>%BGood%A</size>%n%s"",
       ""color"": [
         1.0,
         0.6,
@@ -153,7 +156,7 @@ namespace HitScoreVisualizer
     },
     {
       ""threshold"": 60,
-      ""text"": ""<size=80%>Decent</size>%n%s%n%B %C %A"",
+      ""text"": ""<size=80%>%BDecent%A</size>%n%s"",
       ""color"": [
         1.0,
         0.0,
@@ -163,7 +166,7 @@ namespace HitScoreVisualizer
       ""fade"": true
     },
     {
-      ""text"": ""<size=80%>Way Off</size>%n%s%n%B %C %A"",
+      ""text"": ""<size=80%>%BWay Off%A</size>%n%s"",
       ""color"": [
         0.5,
         0.0,
@@ -175,44 +178,29 @@ namespace HitScoreVisualizer
   ],
   ""beforeCutAngleJudgments"": [
     {
-	  ""threshold"": 70,
+      ""threshold"": 70,
       ""text"": ""+""
     },
     {
-	  ""threshold"": 35,
       ""text"": ""  ""
-    },
-    {
-	  ""threshold"": 0,
-      ""text"": ""-""
     }
   ],
   ""accuracyJudgments"": [
     {
-	  ""threshold"": 10,
+      ""threshold"": 10,
       ""text"": ""+""
     },
     {
-	  ""threshold"": 5,
       ""text"": ""  ""
-    },
-    {
-	  ""threshold"": 0,
-      ""text"": ""-""
     }
   ],
   ""afterCutAngleJudgments"": [
     {
-	  ""threshold"": 30,
+      ""threshold"": 30,
       ""text"": ""+""
     },
     {
-	  ""threshold"": 15,
       ""text"": ""  ""
-    },
-    {
-	  ""threshold"": 0,
-      ""text"": ""-""
     }
   ]
 }";
@@ -278,9 +266,9 @@ namespace HitScoreVisualizer
                     loaded.patchVersion = 0;
                     isDirty = true;
                 }
-                if (loaded.majorVersion == 2 && loaded.minorVersion == 1 && loaded.patchVersion < 3)
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 1 && loaded.patchVersion < Plugin.patchVersion)
                 {
-                    loaded.patchVersion = 3;
+                    loaded.patchVersion = Plugin.patchVersion;
                     isDirty = true;
                 }
                 if (isDirty) save();
@@ -345,8 +333,16 @@ namespace HitScoreVisualizer
             instance = DEFAULT_CONFIG;
         }
 
-        public static void judge(FlyingScoreTextEffect text, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, ref Color color, int score, int before, int after, int accuracy)
+        public static void judge(FlyingScoreEffect scoreEffect, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, ref Color color, int score, int before, int after, int accuracy)
         {
+            // as of 0.13, the TextMeshPro is private; use reflection to grab it out of a private field
+            TextMeshPro text = scoreEffect.getPrivateField<TextMeshPro>("_text");
+            // enable rich text
+            text.richText = true;
+            // disable word wrap, make sure full text displays
+            text.enableWordWrapping = false;
+            text.overflowMode = TextOverflowModes.Overflow;
+
             Judgment judgment = DEFAULT_JUDGMENT;
             int index; // save in case we need to fade
             for (index = 0; index < instance.judgments.Length; index++)
@@ -435,6 +431,7 @@ namespace HitScoreVisualizer
             }
             if (instance.displayMode == "numeric")
             {
+                text.text = score.ToString();
                 return;
             }
             if (instance.displayMode == "scoreOnTop")
