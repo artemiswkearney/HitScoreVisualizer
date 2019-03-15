@@ -109,7 +109,7 @@ namespace HitScoreVisualizer
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
   ""minorVersion"": 1,
-  ""patchVersion"": 5,
+  ""patchVersion"": 6,
   ""isDefaultConfig"": true,
   ""displayMode"": ""format"",
   ""judgments"": [

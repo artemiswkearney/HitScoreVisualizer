@@ -9,11 +9,11 @@ namespace HitScoreVisualizer
     public class Plugin : IPlugin
     {
         public string Name => "HitScoreVisualizer";
-        public string Version => "2.1.5";
+        public string Version => "2.1.6";
 
         internal const int majorVersion = 2;
         internal const int minorVersion = 1;
-        internal const int patchVersion = 5;
+        internal const int patchVersion = 6;
 
         public void OnApplicationStart()
         {
