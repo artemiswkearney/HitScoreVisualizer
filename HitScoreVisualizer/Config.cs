@@ -78,6 +78,7 @@ namespace HitScoreVisualizer
         // - %a: The score contributed by the part of the swing after cutting the block.
         // - %B, %C, %A: As above, except using the appropriate judgment from that part of the swing (as configured for "beforeCutAngleJudgments", "accuracyJudgments", or "afterCutAngleJudgments").
         // - %s: The total score for the cut.
+        // - %p: The percent out of 110 you achieved with your swing's score
         // - %%: A literal percent symbol.
         // - %n: A newline.
         //
@@ -403,6 +404,9 @@ namespace HitScoreVisualizer
                             break;
                         case 's':
                             formattedBuilder.Append(score);
+                            break;
+                        case 'p':
+                            formattedBuilder.Append(string.Format("{0:0}", score / 110d * 100));
                             break;
                         case '%':
                             formattedBuilder.Append("%");
