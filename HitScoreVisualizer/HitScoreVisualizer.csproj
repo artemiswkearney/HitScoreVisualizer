@@ -81,7 +81,6 @@
     <Compile Include="Configs.cs" />
     <Compile Include="Harmony Patches\FlyingScoreEffectHandleSaberAfterCutSwingRatingCounterDidChangeEvent.cs" />
     <Compile Include="Harmony Patches\FlyingScoreEffectInitAndPresent.cs" />
-    <Compile Include="Log.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="PluginConfig.cs" />
