@@ -1,0 +1,10 @@
+﻿{
+  "$schema": "https://raw.githubusercontent.com/nike4613/ModSaber-MetadataFileSchema/master/Schema.json",
+  "author": "Auros",
+  "description": "",
+  "features": [],
+  "gameVersion": "0.13.2",
+  "id": null,
+  "name": "HitScoreVisualizer",
+  "version": "2.1.6"
+}
