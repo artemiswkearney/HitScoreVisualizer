@@ -22,7 +22,7 @@ namespace HitScoreVisualizer.Harmony_Patches
         {
             ScoreController.ScoreWithoutMultiplier(noteCutInfo, saberAfterCutSwingRatingCounter, out int before_plus_acc, out int after, out int accuracy);
             int total = before_plus_acc + after;
-            Config.judge(__instance, noteCutInfo, saberAfterCutSwingRatingCounter, ref ____color, total, before_plus_acc - accuracy, after, accuracy);
+            Configs.judge(__instance, noteCutInfo, saberAfterCutSwingRatingCounter, ref ____color, total, before_plus_acc - accuracy, after, accuracy);
         }
     }
 }
