@@ -115,7 +115,7 @@ namespace HitScoreVisualizer
   ""displayMode"": ""format"",
   ""judgments"": [
     {
-      ""threshold"": 110,
+      ""threshold"": 115,
       ""text"": ""%BFantastic%A%n%s"",
       ""color"": [
         1.0,
@@ -188,7 +188,7 @@ namespace HitScoreVisualizer
   ],
   ""accuracyJudgments"": [
     {
-      ""threshold"": 10,
+      ""threshold"": 15,
       ""text"": ""+""
     },
     {
