@@ -20,7 +20,7 @@ namespace HitScoreVisualizer.Harmony_Patches
     {
         static void Postfix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
         {
-            ScoreController.ScoreWithoutMultiplier(noteCutInfo, saberAfterCutSwingRatingCounter, out int before_plus_acc, out int after, out int accuracy);
+            ScoreController.RawScoreWithoutMultiplier(noteCutInfo, saberAfterCutSwingRatingCounter, out int before_plus_acc, out int after, out int accuracy);
             int total = before_plus_acc + after;
             Config.judge(__instance, noteCutInfo, saberAfterCutSwingRatingCounter, ref ____color, total, before_plus_acc - accuracy, after, accuracy);
         }
