@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -78,7 +75,7 @@ namespace HitScoreVisualizer
         // - %a: The score contributed by the part of the swing after cutting the block.
         // - %B, %C, %A: As above, except using the appropriate judgment from that part of the swing (as configured for "beforeCutAngleJudgments", "accuracyJudgments", or "afterCutAngleJudgments").
         // - %s: The total score for the cut.
-        // - %p: The percent out of 110 you achieved with your swing's score
+        // - %p: The percent out of 115 you achieved with your swing's score
         // - %%: A literal percent symbol.
         // - %n: A newline.
         //
@@ -109,8 +106,8 @@ namespace HitScoreVisualizer
 
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
-  ""minorVersion"": 1,
-  ""patchVersion"": 6,
+  ""minorVersion"": 2,
+  ""patchVersion"": 0,
   ""isDefaultConfig"": true,
   ""displayMode"": ""format"",
   ""judgments"": [
@@ -267,11 +264,37 @@ namespace HitScoreVisualizer
                     loaded.patchVersion = 0;
                     isDirty = true;
                 }
-                if (loaded.majorVersion == 2 && loaded.minorVersion == 1 && loaded.patchVersion < Plugin.patchVersion)
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 1)
                 {
-                    loaded.patchVersion = Plugin.patchVersion;
+                    // Beat Saber version 1.0.0 increased the max score given for cut accuracy from 10 to 15, and thus the max total score from 110 to 115.
+                    // We assume that anyone whose config contained a judgment requiring an accuracy score of 10 or a total score of 110 intended those values
+                    // to refer to the highest achievable score rather than those exact numbers, and thus update them accordingly.
+                    // As we can't know what users would want done with their other judgment thresholds, those are left unchanged.
+                    if (loaded.judgments != null)
+                    {
+                        for (int i = 0; i < loaded.judgments.Length; i++)
+                        {
+                            if (loaded.judgments[i].threshold == 110)
+                            {
+                                loaded.judgments[i].threshold = 115;
+                            }
+                        }
+                    }
+                    if (loaded.accuracyJudgments != null)
+                    {
+                        for (int i = 0; i < loaded.accuracyJudgments.Length; i++)
+                        {
+                            if (loaded.accuracyJudgments[i].threshold == 10)
+                            {
+                                loaded.accuracyJudgments[i].threshold = 15;
+                            }
+                        }
+                    }
+                    loaded.minorVersion = 2;
+                    loaded.patchVersion = 0;
                     isDirty = true;
                 }
+                instance = loaded;
                 if (isDirty) save();
             }
             instance = loaded;
@@ -406,7 +429,7 @@ namespace HitScoreVisualizer
                             formattedBuilder.Append(score);
                             break;
                         case 'p':
-                            formattedBuilder.Append(string.Format("{0:0}", score / 110d * 100));
+                            formattedBuilder.Append(string.Format("{0:0}", score / 115d * 100));
                             break;
                         case '%':
                             formattedBuilder.Append("%");
