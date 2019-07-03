@@ -86,6 +86,17 @@ namespace HitScoreVisualizer
         [DefaultValue("")]
         public string displayMode;
 
+        // If enabled, judgments will appear and stay at (fixedPosX, fixedPosY, fixedPosZ) rather than moving as normal.
+        // Additionally, the previous judgment will disappear when a new one is created (so there won't be overlap).
+        [DefaultValue(false)]
+        public bool useFixedPos;
+        [DefaultValue(0f)]
+        public float fixedPosX;
+        [DefaultValue(0f)]
+        public float fixedPosY;
+        [DefaultValue(0f)]
+        public float fixedPosZ;
+
         // Order from highest threshold to lowest; the first matching judgment will be applied
         public Judgment[] judgments;
 
@@ -106,7 +117,7 @@ namespace HitScoreVisualizer
 
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
-  ""minorVersion"": 2,
+  ""minorVersion"": 3,
   ""patchVersion"": 0,
   ""isDefaultConfig"": true,
   ""displayMode"": ""format"",
@@ -291,6 +302,12 @@ namespace HitScoreVisualizer
                         }
                     }
                     loaded.minorVersion = 2;
+                    loaded.patchVersion = 0;
+                    isDirty = true;
+                }
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 2)
+                {
+                    loaded.minorVersion = 3;
                     loaded.patchVersion = 0;
                     isDirty = true;
                 }
