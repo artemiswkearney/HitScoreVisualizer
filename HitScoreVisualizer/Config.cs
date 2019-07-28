@@ -97,6 +97,10 @@ namespace HitScoreVisualizer
         [DefaultValue(0f)]
         public float fixedPosZ;
 
+        // If enabled, judgments will be updated more frequently. This will make score popups more accurate during a brief period before the note's score is finalized, at some cost of performance.
+        [DefaultValue(false)]
+        public bool doIntermediateUpdates;
+
         // Order from highest threshold to lowest; the first matching judgment will be applied
         public Judgment[] judgments;
 
@@ -117,7 +121,7 @@ namespace HitScoreVisualizer
 
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
-  ""minorVersion"": 3,
+  ""minorVersion"": 4,
   ""patchVersion"": 0,
   ""isDefaultConfig"": true,
   ""displayMode"": ""format"",
@@ -305,9 +309,13 @@ namespace HitScoreVisualizer
                     loaded.patchVersion = 0;
                     isDirty = true;
                 }
-                if (loaded.majorVersion == 2 && loaded.minorVersion == 2)
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 2 || loaded.minorVersion == 3)
                 {
-                    loaded.minorVersion = 3;
+                    // Leaving this on to preserve identical behavior to previous versions.
+                    // However, since the option is non-default, a line for it will be generated in the config.
+                    loaded.doIntermediateUpdates = true;
+
+                    loaded.minorVersion = 4;
                     loaded.patchVersion = 0;
                     isDirty = true;
                 }
@@ -374,7 +382,7 @@ namespace HitScoreVisualizer
             instance = DEFAULT_CONFIG;
         }
 
-        public static void judge(FlyingScoreEffect scoreEffect, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, ref Color color, int score, int before, int after, int accuracy)
+        public static void judge(FlyingScoreEffect scoreEffect, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, int score, int before, int after, int accuracy)
         {
             // as of 0.13, the TextMeshPro is private; use reflection to grab it out of a private field
             TextMeshPro text = scoreEffect.getPrivateField<TextMeshPro>("_text");
@@ -383,6 +391,7 @@ namespace HitScoreVisualizer
             // disable word wrap, make sure full text displays
             text.enableWordWrapping = false;
             text.overflowMode = TextOverflowModes.Overflow;
+
 
             Judgment judgment = DEFAULT_JUDGMENT;
             int index; // save in case we need to fade
@@ -395,6 +404,8 @@ namespace HitScoreVisualizer
                     break;
                 }
             }
+
+            Color color;
             if (judgment.fade)
             {
                 Judgment fadeJudgment = instance.judgments[index - 1];
@@ -407,6 +418,7 @@ namespace HitScoreVisualizer
             {
                 color = toColor(judgment.color);
             }
+            scoreEffect.setPrivateField("_color", color);
 
             if (instance.displayMode == "format")
             {
