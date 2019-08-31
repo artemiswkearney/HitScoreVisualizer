@@ -12,11 +12,14 @@ namespace HitScoreVisualizer.Harmony_Patches
         new Type[] { typeof(SaberAfterCutSwingRatingCounter), typeof(float) })]
     class FlyingScoreEffectHandleSaberAfterCutSwingRatingCounterDidChangeEvent
     {
-        static bool Prefix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo ____noteCutInfo)
+        static bool Prefix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreEffect __instance, NoteCutInfo ____noteCutInfo)
         {
-            ScoreController.ScoreWithoutMultiplier(____noteCutInfo, saberAfterCutSwingRatingCounter, out int before_plus_acc, out int after, out int accuracy);
-            int total = before_plus_acc + after;
-            Config.judge(__instance, ____noteCutInfo, saberAfterCutSwingRatingCounter, ref ____color, total, before_plus_acc - accuracy, after, accuracy);
+            if (Config.instance.doIntermediateUpdates)
+            {
+                ScoreController.RawScoreWithoutMultiplier(____noteCutInfo, saberAfterCutSwingRatingCounter, out int before_plus_acc, out int after, out int accuracy);
+                int total = before_plus_acc + after;
+                Config.judge(__instance, ____noteCutInfo, saberAfterCutSwingRatingCounter, total, before_plus_acc - accuracy, after, accuracy);
+            }
             return false;
         }
     }

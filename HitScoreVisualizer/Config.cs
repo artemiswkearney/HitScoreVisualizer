@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -78,7 +75,7 @@ namespace HitScoreVisualizer
         // - %a: The score contributed by the part of the swing after cutting the block.
         // - %B, %C, %A: As above, except using the appropriate judgment from that part of the swing (as configured for "beforeCutAngleJudgments", "accuracyJudgments", or "afterCutAngleJudgments").
         // - %s: The total score for the cut.
-        // - %p: The percent out of 110 you achieved with your swing's score
+        // - %p: The percent out of 115 you achieved with your swing's score
         // - %%: A literal percent symbol.
         // - %n: A newline.
         //
@@ -88,6 +85,21 @@ namespace HitScoreVisualizer
         // Otherwise, displays both (judgment text above numeric score).
         [DefaultValue("")]
         public string displayMode;
+
+        // If enabled, judgments will appear and stay at (fixedPosX, fixedPosY, fixedPosZ) rather than moving as normal.
+        // Additionally, the previous judgment will disappear when a new one is created (so there won't be overlap).
+        [DefaultValue(false)]
+        public bool useFixedPos;
+        [DefaultValue(0f)]
+        public float fixedPosX;
+        [DefaultValue(0f)]
+        public float fixedPosY;
+        [DefaultValue(0f)]
+        public float fixedPosZ;
+
+        // If enabled, judgments will be updated more frequently. This will make score popups more accurate during a brief period before the note's score is finalized, at some cost of performance.
+        [DefaultValue(false)]
+        public bool doIntermediateUpdates;
 
         // Order from highest threshold to lowest; the first matching judgment will be applied
         public Judgment[] judgments;
@@ -109,13 +121,13 @@ namespace HitScoreVisualizer
 
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
-  ""minorVersion"": 1,
-  ""patchVersion"": 6,
+  ""minorVersion"": 4,
+  ""patchVersion"": 0,
   ""isDefaultConfig"": true,
   ""displayMode"": ""format"",
   ""judgments"": [
     {
-      ""threshold"": 110,
+      ""threshold"": 115,
       ""text"": ""%BFantastic%A%n%s"",
       ""color"": [
         1.0,
@@ -188,7 +200,7 @@ namespace HitScoreVisualizer
   ],
   ""accuracyJudgments"": [
     {
-      ""threshold"": 10,
+      ""threshold"": 15,
       ""text"": ""+""
     },
     {
@@ -267,11 +279,47 @@ namespace HitScoreVisualizer
                     loaded.patchVersion = 0;
                     isDirty = true;
                 }
-                if (loaded.majorVersion == 2 && loaded.minorVersion == 1 && loaded.patchVersion < Plugin.patchVersion)
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 1)
                 {
-                    loaded.patchVersion = Plugin.patchVersion;
+                    // Beat Saber version 1.0.0 increased the max score given for cut accuracy from 10 to 15, and thus the max total score from 110 to 115.
+                    // We assume that anyone whose config contained a judgment requiring an accuracy score of 10 or a total score of 110 intended those values
+                    // to refer to the highest achievable score rather than those exact numbers, and thus update them accordingly.
+                    // As we can't know what users would want done with their other judgment thresholds, those are left unchanged.
+                    if (loaded.judgments != null)
+                    {
+                        for (int i = 0; i < loaded.judgments.Length; i++)
+                        {
+                            if (loaded.judgments[i].threshold == 110)
+                            {
+                                loaded.judgments[i].threshold = 115;
+                            }
+                        }
+                    }
+                    if (loaded.accuracyJudgments != null)
+                    {
+                        for (int i = 0; i < loaded.accuracyJudgments.Length; i++)
+                        {
+                            if (loaded.accuracyJudgments[i].threshold == 10)
+                            {
+                                loaded.accuracyJudgments[i].threshold = 15;
+                            }
+                        }
+                    }
+                    loaded.minorVersion = 2;
+                    loaded.patchVersion = 0;
                     isDirty = true;
                 }
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 2 || loaded.minorVersion == 3)
+                {
+                    // Leaving this on to preserve identical behavior to previous versions.
+                    // However, since the option is non-default, a line for it will be generated in the config.
+                    loaded.doIntermediateUpdates = true;
+
+                    loaded.minorVersion = 4;
+                    loaded.patchVersion = 0;
+                    isDirty = true;
+                }
+                instance = loaded;
                 if (isDirty) save();
             }
             instance = loaded;
@@ -334,7 +382,7 @@ namespace HitScoreVisualizer
             instance = DEFAULT_CONFIG;
         }
 
-        public static void judge(FlyingScoreEffect scoreEffect, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, ref Color color, int score, int before, int after, int accuracy)
+        public static void judge(FlyingScoreEffect scoreEffect, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, int score, int before, int after, int accuracy)
         {
             // as of 0.13, the TextMeshPro is private; use reflection to grab it out of a private field
             TextMeshPro text = scoreEffect.getPrivateField<TextMeshPro>("_text");
@@ -343,6 +391,7 @@ namespace HitScoreVisualizer
             // disable word wrap, make sure full text displays
             text.enableWordWrapping = false;
             text.overflowMode = TextOverflowModes.Overflow;
+
 
             Judgment judgment = DEFAULT_JUDGMENT;
             int index; // save in case we need to fade
@@ -355,6 +404,8 @@ namespace HitScoreVisualizer
                     break;
                 }
             }
+
+            Color color;
             if (judgment.fade)
             {
                 Judgment fadeJudgment = instance.judgments[index - 1];
@@ -367,6 +418,7 @@ namespace HitScoreVisualizer
             {
                 color = toColor(judgment.color);
             }
+            scoreEffect.setPrivateField("_color", color);
 
             if (instance.displayMode == "format")
             {
@@ -406,7 +458,7 @@ namespace HitScoreVisualizer
                             formattedBuilder.Append(score);
                             break;
                         case 'p':
-                            formattedBuilder.Append(string.Format("{0:0}", score / 110d * 100));
+                            formattedBuilder.Append(string.Format("{0:0}", score / 115d * 100));
                             break;
                         case '%':
                             formattedBuilder.Append("%");

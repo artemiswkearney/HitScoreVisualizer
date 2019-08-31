@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+using static HitScoreVisualizer.Utils.ReflectionUtil;
+
 namespace HitScoreVisualizer.Harmony_Patches
 {
     [HarmonyPatch(typeof(FlyingScoreEffect), "InitAndPresent",
@@ -18,11 +20,50 @@ namespace HitScoreVisualizer.Harmony_Patches
             typeof(SaberAfterCutSwingRatingCounter)})]
     class FlyingScoreEffectInitAndPresent
     {
+        public static FlyingScoreEffect currentEffect = null;
+        static void Prefix(ref Vector3 targetPos, FlyingScoreEffect __instance)
+        {
+            if (Config.instance.useFixedPos)
+            {
+                // Set current and target position to the desired fixed position
+                __instance.transform.position = new Vector3(Config.instance.fixedPosX, Config.instance.fixedPosY, Config.instance.fixedPosZ);
+                targetPos = __instance.transform.position;
+                // If there's an existing judgment effect, clear that first
+                if (currentEffect != null)
+                {
+                    // Remove it gracefully by setting its duration to 0
+                    currentEffect.setPrivateFieldBase("_duration", 0f);
+                    // We don't need to clear currentEffect when it disappears, because we'll be setting it to the new effect anyway
+                    currentEffect.didFinishEvent -= handleEffectDidFinish;
+                }
+                // Save the existing effect to clear if a new one spawns
+                currentEffect = __instance;
+                // In case it despawns before the next note is hit, don't try to clear it
+                currentEffect.didFinishEvent += handleEffectDidFinish;
+            }
+        }
+
+        static void handleEffectDidFinish(FlyingObjectEffect effect)
+        {
+            effect.didFinishEvent -= handleEffectDidFinish;
+            if (currentEffect == effect) currentEffect = null;
+        }
+
         static void Postfix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
         {
-            ScoreController.ScoreWithoutMultiplier(noteCutInfo, saberAfterCutSwingRatingCounter, out int before_plus_acc, out int after, out int accuracy);
-            int total = before_plus_acc + after;
-            Config.judge(__instance, noteCutInfo, saberAfterCutSwingRatingCounter, ref ____color, total, before_plus_acc - accuracy, after, accuracy);
+            void judge(SaberAfterCutSwingRatingCounter counter)
+            {
+                ScoreController.RawScoreWithoutMultiplier(noteCutInfo, counter, out int before_plus_acc, out int after, out int accuracy);
+                int total = before_plus_acc + after;
+                Config.judge(__instance, noteCutInfo, counter, total, before_plus_acc - accuracy, after, accuracy);
+
+                // If the counter is finished, remove our event from it
+                counter.didFinishEvent -= judge;
+            }
+
+            // Apply judgments a total of twice - once when the effect is created, once when it finishes.
+            judge(saberAfterCutSwingRatingCounter);
+            saberAfterCutSwingRatingCounter.didFinishEvent += judge;
         }
     }
 }
