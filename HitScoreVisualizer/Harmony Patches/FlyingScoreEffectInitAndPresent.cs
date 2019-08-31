@@ -16,8 +16,7 @@ namespace HitScoreVisualizer.Harmony_Patches
             typeof(int),
             typeof(float),
             typeof(Vector3),
-            typeof(Color),
-            typeof(SaberAfterCutSwingRatingCounter)})]
+            typeof(Color)})]
     class FlyingScoreEffectInitAndPresent
     {
         public static FlyingScoreEffect currentEffect = null;
@@ -49,11 +48,11 @@ namespace HitScoreVisualizer.Harmony_Patches
             if (currentEffect == effect) currentEffect = null;
         }
 
-        static void Postfix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
+        static void Postfix(FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
         {
-            void judge(SaberAfterCutSwingRatingCounter counter)
+            void judge(SaberSwingRatingCounter counter)
             {
-                ScoreController.RawScoreWithoutMultiplier(noteCutInfo, counter, out int before_plus_acc, out int after, out int accuracy);
+                ScoreController.RawScoreWithoutMultiplier(noteCutInfo, out int before_plus_acc, out int after, out int accuracy);
                 int total = before_plus_acc + after;
                 Config.judge(__instance, noteCutInfo, counter, total, before_plus_acc - accuracy, after, accuracy);
 
@@ -62,8 +61,8 @@ namespace HitScoreVisualizer.Harmony_Patches
             }
 
             // Apply judgments a total of twice - once when the effect is created, once when it finishes.
-            judge(saberAfterCutSwingRatingCounter);
-            saberAfterCutSwingRatingCounter.didFinishEvent += judge;
+            judge(noteCutInfo.swingRatingCounter);
+            noteCutInfo.swingRatingCounter.didFinishEvent += judge;
         }
     }
 }
