@@ -52,9 +52,10 @@ namespace HitScoreVisualizer.Harmony_Patches
         {
             void judge(SaberSwingRatingCounter counter)
             {
-                ScoreController.RawScoreWithoutMultiplier(noteCutInfo, out int before_plus_acc, out int after, out int accuracy);
-                int total = before_plus_acc + after;
-                Config.judge(__instance, noteCutInfo, counter, total, before_plus_acc - accuracy, after, accuracy);
+                
+                ScoreController.RawScoreWithoutMultiplier(noteCutInfo, out int before, out int after, out int accuracy);
+                int total = before + after + accuracy;
+                Config.judge(__instance, noteCutInfo, counter, total, before, after, accuracy);
 
                 // If the counter is finished, remove our event from it
                 counter.didFinishEvent -= judge;
