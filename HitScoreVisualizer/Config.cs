@@ -382,7 +382,7 @@ namespace HitScoreVisualizer
             instance = DEFAULT_CONFIG;
         }
 
-        public static void judge(FlyingScoreEffect scoreEffect, NoteCutInfo noteCutInfo, SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, int score, int before, int after, int accuracy)
+        public static void judge(FlyingScoreEffect scoreEffect, int score, int before, int after, int accuracy)
         {
             // as of 0.13, the TextMeshPro is private; use reflection to grab it out of a private field
             TextMeshPro text = scoreEffect.getPrivateField<TextMeshPro>("_text");
