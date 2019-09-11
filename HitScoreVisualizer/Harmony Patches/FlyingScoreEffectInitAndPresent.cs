@@ -63,8 +63,11 @@ namespace HitScoreVisualizer.Harmony_Patches
 
             // Apply judgments a total of twice - once when the effect is created, once when it finishes.
             judge(noteCutInfo.swingRatingCounter);
-            noteCutInfo.swingRatingCounter.didFinishEvent -= judge; // Just in case
-            noteCutInfo.swingRatingCounter.didFinishEvent += judge;
+            if (!Config.instance.doIntermediateUpdates) // Don't need a judge on didFinishEvent if doIntermediateUpdates is on
+            {
+                noteCutInfo.swingRatingCounter.didFinishEvent -= judge; // Just in case
+                noteCutInfo.swingRatingCounter.didFinishEvent += judge;
+            }
         }
     }
 }
