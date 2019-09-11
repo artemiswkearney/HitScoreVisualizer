@@ -16,8 +16,7 @@ namespace HitScoreVisualizer.Harmony_Patches
             typeof(int),
             typeof(float),
             typeof(Vector3),
-            typeof(Color),
-            typeof(SaberAfterCutSwingRatingCounter)})]
+            typeof(Color)})]
     class FlyingScoreEffectInitAndPresent
     {
         public static FlyingScoreEffect currentEffect = null;
@@ -39,6 +38,7 @@ namespace HitScoreVisualizer.Harmony_Patches
                 // Save the existing effect to clear if a new one spawns
                 currentEffect = __instance;
                 // In case it despawns before the next note is hit, don't try to clear it
+                currentEffect.didFinishEvent -= handleEffectDidFinish; // Just in case
                 currentEffect.didFinishEvent += handleEffectDidFinish;
             }
         }
@@ -49,21 +49,25 @@ namespace HitScoreVisualizer.Harmony_Patches
             if (currentEffect == effect) currentEffect = null;
         }
 
-        static void Postfix(SaberAfterCutSwingRatingCounter saberAfterCutSwingRatingCounter, FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
+        static void Postfix(FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
         {
-            void judge(SaberAfterCutSwingRatingCounter counter)
+            void judge(SaberSwingRatingCounter counter)
             {
-                ScoreController.RawScoreWithoutMultiplier(noteCutInfo, counter, out int before_plus_acc, out int after, out int accuracy);
-                int total = before_plus_acc + after;
-                Config.judge(__instance, noteCutInfo, counter, total, before_plus_acc - accuracy, after, accuracy);
+                ScoreController.RawScoreWithoutMultiplier(noteCutInfo, out int before, out int after, out int accuracy);
+                int total = before + after + accuracy;
+                Config.judge(__instance, total, before, after, accuracy);
 
                 // If the counter is finished, remove our event from it
                 counter.didFinishEvent -= judge;
             }
 
             // Apply judgments a total of twice - once when the effect is created, once when it finishes.
-            judge(saberAfterCutSwingRatingCounter);
-            saberAfterCutSwingRatingCounter.didFinishEvent += judge;
+            judge(noteCutInfo.swingRatingCounter);
+            if (!Config.instance.doIntermediateUpdates) // Don't need a judge on didFinishEvent if doIntermediateUpdates is on
+            {
+                noteCutInfo.swingRatingCounter.didFinishEvent -= judge; // Just in case
+                noteCutInfo.swingRatingCounter.didFinishEvent += judge;
+            }
         }
     }
 }
