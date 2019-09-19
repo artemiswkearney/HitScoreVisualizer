@@ -1,5 +1,5 @@
 ﻿using Harmony;
-using IllusionPlugin;
+using IPA.Old;
 using System;
 using System.Reflection;
 using UnityEngine.SceneManagement;
