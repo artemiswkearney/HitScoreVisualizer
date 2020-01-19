@@ -16,6 +16,7 @@ namespace HitScoreVisualizer.Harmony_Patches
             typeof(int),
             typeof(float),
             typeof(Vector3),
+            typeof(Quaternion),
             typeof(Color)})]
     class FlyingScoreEffectInitAndPresent
     {
