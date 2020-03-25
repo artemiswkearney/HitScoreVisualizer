@@ -122,7 +122,7 @@ namespace HitScoreVisualizer
         private const string DEFAULT_JSON = @"{
   ""majorVersion"": 2,
   ""minorVersion"": 4,
-  ""patchVersion"": 2,
+  ""patchVersion"": 3,
   ""isDefaultConfig"": true,
   ""displayMode"": ""format"",
   ""judgments"": [
@@ -319,9 +319,9 @@ namespace HitScoreVisualizer
                     loaded.patchVersion = 1;
                     isDirty = true;
                 }
-                if (loaded.majorVersion == 2 && loaded.minorVersion == 4 && loaded.patchVersion == 1)
+                if (loaded.majorVersion == 2 && loaded.minorVersion == 4 && loaded.patchVersion < 3)
                 {
-                    loaded.patchVersion = 2;
+                    loaded.patchVersion = 3;
                     isDirty = true;
                 }
                 instance = loaded;

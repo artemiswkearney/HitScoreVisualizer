@@ -16,7 +16,7 @@ namespace HitScoreVisualizer.Harmony_Patches
         {
             if (Config.instance.doIntermediateUpdates)
             {
-                ScoreController.RawScoreWithoutMultiplier(____noteCutInfo, out int before, out int after, out int accuracy);
+                ScoreModel.RawScoreWithoutMultiplier(____noteCutInfo, out int before, out int after, out int accuracy);
                 int total = before + after + accuracy;
                 Config.judge(__instance, ____noteCutInfo, saberSwingRatingCounter, total, before, after, accuracy);
             }
