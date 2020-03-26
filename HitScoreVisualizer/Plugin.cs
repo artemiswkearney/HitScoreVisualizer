@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using IPA.Old;
 using System;
 using System.Reflection;
@@ -9,11 +9,11 @@ namespace HitScoreVisualizer
     public class Plugin : IPlugin
     {
         public string Name => "HitScoreVisualizer";
-        public string Version => "2.4.3";
+        public string Version => "2.4.4";
 
         internal const int majorVersion = 2;
         internal const int minorVersion = 4;
-        internal const int patchVersion = 3;
+        internal const int patchVersion = 4;
 
         public void OnApplicationStart()
         {
@@ -21,7 +21,7 @@ namespace HitScoreVisualizer
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             try
             {
-                var harmony = HarmonyInstance.Create("com.arti.BeatSaber.HitScoreVisualizer");
+                var harmony = new Harmony("com.arti.BeatSaber.HitScoreVisualizer");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
             }
             catch (Exception e)
