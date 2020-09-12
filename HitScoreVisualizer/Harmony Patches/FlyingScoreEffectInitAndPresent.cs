@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using HitScoreVisualizer.Utils;
+using IPA.Utilities;
 using UnityEngine;
 
 namespace HitScoreVisualizer.Harmony_Patches
@@ -25,7 +25,7 @@ namespace HitScoreVisualizer.Harmony_Patches
 				if (_currentEffect != null)
 				{
 					// Remove it gracefully by setting its duration to 0
-					_currentEffect.setPrivateField("_duration", 0f);
+					_currentEffect.SetField("_duration", 0f);
 
 					// We don't need to clear currentEffect when it disappears, because we'll be setting it to the new effect anyway
 					_currentEffect.didFinishEvent -= HandleEffectDidFinish;

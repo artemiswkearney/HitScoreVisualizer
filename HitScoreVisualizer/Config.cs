@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using HitScoreVisualizer.Utils;
+using IPA.Utilities;
 using TMPro;
 using UnityEngine;
 
@@ -418,7 +418,7 @@ namespace HitScoreVisualizer
 		public static void Judge(FlyingScoreEffect scoreEffect, NoteCutInfo noteCutInfo, SaberSwingRatingCounter saberSwingRatingCounter, int score, int before, int after, int accuracy)
 		{
 			// as of 0.13, the TextMeshPro is private; use reflection to grab it out of a private field
-			var text = scoreEffect.getPrivateField<TextMeshPro>("_text");
+			var text = scoreEffect.GetField<TextMeshPro, FlyingScoreEffect>("_text");
 			// enable rich text
 			text.richText = true;
 			// disable word wrap, make sure full text displays
@@ -452,7 +452,7 @@ namespace HitScoreVisualizer
 				color = ToColor(judgment.color);
 			}
 
-			scoreEffect.setPrivateField("_color", color);
+			scoreEffect.SetField("_color", color);
 
 			if (instance.displayMode == "format")
 			{
