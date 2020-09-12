@@ -1,0 +1,15 @@
+﻿{
+	"$schema": "https://raw.githubusercontent.com/beat-saber-modding-group/BSIPA-MetadataFileSchema/master/Schema.json",
+	"id": "HitScoreVisualizer",
+	"name": "HitScoreVisualizer",
+	"description": "Visualizes the scores of your hits! Overly complex config options! Numbers? All the pros use it, except the ones who don't. (But they should.)",
+	"author": "Eris",
+	"gameVersion": "1.11.0",
+	"version": "2.4.4",
+	"dependsOn": {
+		"BSIPA": "^4.0.5"
+	},
+	"links": {
+		"project-home": "https://github.com/ErisApps/HitScoreVisualizer"
+	}
+}
