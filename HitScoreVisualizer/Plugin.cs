@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using System;
 using System.Reflection;
 using HitScoreVisualizer.Extensions;
 using IPA;
@@ -34,17 +33,8 @@ namespace HitScoreVisualizer
 		[OnEnable]
 		public void OnEnable()
 		{
-			try
-			{
-				_harmonyInstance = new Harmony(HARMONY_ID);
-				_harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
-			}
-			catch (Exception e)
-			{
-				Logger.Warn("[HitScoreVisualizer] This plugin requires Harmony. Make sure you " +
-				            "installed the plugin properly, as the Harmony DLL should have been installed with it.");
-				Logger.Error(e);
-			}
+			_harmonyInstance = new Harmony(HARMONY_ID);
+			_harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
 
 			Config.Load();
 		}
@@ -52,16 +42,7 @@ namespace HitScoreVisualizer
 		[OnDisable]
 		public void OnDisable()
 		{
-			try
-			{
-				_harmonyInstance?.UnpatchAll(HARMONY_ID);
-			}
-			catch (Exception e)
-			{
-				Logger.Warn("[HitScoreVisualizer] This plugin requires Harmony. Make sure you " +
-				            "installed the plugin properly, as the Harmony DLL should have been installed with it.");
-				Logger.Error(e);
-			}
+			_harmonyInstance?.UnpatchAll(HARMONY_ID);
 		}
 	}
 }
