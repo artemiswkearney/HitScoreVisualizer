@@ -1,74 +1,78 @@
 ﻿using HarmonyLib;
-using IPA.Old;
 using System;
 using System.Reflection;
-using UnityEngine.SceneManagement;
+using HitScoreVisualizer.Extensions;
+using IPA;
+using IPA.Loader;
+using IPA.Logging;
+using Version = SemVer.Version;
 
 namespace HitScoreVisualizer
 {
-    public class Plugin : IPlugin
-    {
-        public string Name => "HitScoreVisualizer";
-        public string Version => "2.4.4";
+	[Plugin(RuntimeOptions.DynamicInit)]
+	public class Plugin
+	{
+		private const string HARMONY_ID = "be.erisapps.HitScoreVisualizer";
 
-        internal const int majorVersion = 2;
-        internal const int minorVersion = 4;
-        internal const int patchVersion = 4;
+		private static Harmony? _harmonyInstance;
+		private static PluginMetadata? _metadata;
+		private static string? _name;
+		private static Version? _version;
 
-        public void OnApplicationStart()
-        {
-            SceneManager.activeSceneChanged += SceneManagerOnActiveSceneChanged;
-            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
-            try
-            {
-                var harmony = new Harmony("com.arti.BeatSaber.HitScoreVisualizer");
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("[HitScoreVisualizer] This plugin requires Harmony. Make sure you " +
-                    "installed the plugin properly, as the Harmony DLL should have been installed with it.");
-                Console.WriteLine(e);
-            }
-            Config.load();
-        }
+		internal static Logger Logger;
 
-        private void SceneManagerOnActiveSceneChanged(Scene arg0, Scene arg1)
-        {
-        }
+		public static string Name => _name ??= _metadata?.Name ?? Assembly.GetExecutingAssembly().GetName().Name;
+		public static Version Version => _version ??= _metadata?.Version ?? Assembly.GetExecutingAssembly().GetName().Version.ToSemVerVersion();
 
-        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
-        {
-        }
+		internal const int majorVersion = 2;
+		internal const int minorVersion = 4;
+		internal const int patchVersion = 4;
 
-        public void OnApplicationQuit()
-        {
-            SceneManager.activeSceneChanged -= SceneManagerOnActiveSceneChanged;
-            SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
-        }
+		[Init]
+		public void Init(Logger logger, PluginMetadata pluginMetadata)
+		{
+			Logger = logger;
+			_metadata = pluginMetadata;
+		}
 
-        public void OnLevelWasLoaded(int level)
-        {
+		[OnEnable]
+		public void OnEnable()
+		{
+			try
+			{
+				_harmonyInstance = new Harmony(HARMONY_ID);
+				_harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
+			}
+			catch (Exception e)
+			{
+				Logger.Warn("[HitScoreVisualizer] This plugin requires Harmony. Make sure you " +
+				            "installed the plugin properly, as the Harmony DLL should have been installed with it.");
+				Logger.Error(e);
+			}
 
-        }
+			Config.Load();
+		}
 
-        public void OnLevelWasInitialized(int level)
-        {
-        }
+		[OnDisable]
+		public void OnDisable()
+		{
+			try
+			{
+				_harmonyInstance?.UnpatchAll(HARMONY_ID);
+			}
+			catch (Exception e)
+			{
+				Logger.Warn("[HitScoreVisualizer] This plugin requires Harmony. Make sure you " +
+				            "installed the plugin properly, as the Harmony DLL should have been installed with it.");
+				Logger.Error(e);
+			}
+		}
 
-        public void OnUpdate()
-        {
-        }
-
-        public void OnFixedUpdate()
-        {
-        }
-
-        internal static void log(object message)
-        {
+		internal static void log(object message)
+		{
 #if DEBUG
-            Console.WriteLine("[HitScoreVisualizer] " + message);
+			Console.WriteLine("[HitScoreVisualizer] " + message);
 #endif
-        }
-    }
+		}
+	}
 }
