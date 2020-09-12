@@ -24,10 +24,6 @@ namespace HitScoreVisualizer
 		public static string Name => _name ??= _metadata?.Name ?? Assembly.GetExecutingAssembly().GetName().Name;
 		public static Version Version => _version ??= _metadata?.Version ?? Assembly.GetExecutingAssembly().GetName().Version.ToSemVerVersion();
 
-		internal const int majorVersion = 2;
-		internal const int minorVersion = 4;
-		internal const int patchVersion = 4;
-
 		[Init]
 		public void Init(Logger logger, PluginMetadata pluginMetadata)
 		{
@@ -66,13 +62,6 @@ namespace HitScoreVisualizer
 				            "installed the plugin properly, as the Harmony DLL should have been installed with it.");
 				Logger.Error(e);
 			}
-		}
-
-		internal static void log(object message)
-		{
-#if DEBUG
-			Console.WriteLine("[HitScoreVisualizer] " + message);
-#endif
 		}
 	}
 }
