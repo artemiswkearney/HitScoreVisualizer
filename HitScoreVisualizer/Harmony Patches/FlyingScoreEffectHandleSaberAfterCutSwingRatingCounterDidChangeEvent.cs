@@ -1,20 +1,22 @@
 ﻿using HarmonyLib;
+using HitScoreVisualizer.Services;
 
 namespace HitScoreVisualizer.Harmony_Patches
 {
-	[HarmonyPatch(typeof(FlyingScoreEffect), "HandleSaberSwingRatingCounterDidChangeEvent", typeof(SaberSwingRatingCounter), typeof(float))]
+	[HarmonyPatch(typeof(FlyingScoreEffect))]
+	[HarmonyPatch("HandleSaberSwingRatingCounterDidChangeEvent", MethodType.Normal)]
 	internal class FlyingScoreEffectHandleSaberAfterCutSwingRatingCounterDidChangeEvent
 	{
 // ReSharper disable InconsistentNaming
-		private static bool Prefix(SaberSwingRatingCounter saberSwingRatingCounter, FlyingScoreEffect __instance, NoteCutInfo ____noteCutInfo)
+		internal static bool Prefix(FlyingScoreEffect __instance, NoteCutInfo ____noteCutInfo)
 // ReSharper enable InconsistentNaming
 
 		{
-			if (Config.instance.doIntermediateUpdates)
+			if (ConfigProvider.CurrentConfig.DoIntermediateUpdates)
 			{
 				ScoreModel.RawScoreWithoutMultiplier(____noteCutInfo, out var before, out var after, out var accuracy);
 				var total = before + after + accuracy;
-				Config.Judge(__instance, ____noteCutInfo, saberSwingRatingCounter, total, before, after, accuracy);
+				JudgmentService.Judge(__instance, total, before, after, accuracy);
 			}
 
 			return false;

@@ -1,24 +1,26 @@
 ﻿using HarmonyLib;
+using HitScoreVisualizer.Services;
 using IPA.Utilities;
 using UnityEngine;
 
 namespace HitScoreVisualizer.Harmony_Patches
 {
-	[HarmonyPatch(typeof(FlyingScoreEffect), "InitAndPresent", typeof(NoteCutInfo), typeof(int), typeof(float), typeof(Vector3), typeof(Quaternion), typeof(Color))]
+	[HarmonyPatch(typeof(FlyingScoreEffect))]
+	[HarmonyPatch("InitAndPresent", MethodType.Normal)]
 	internal class FlyingScoreEffectInitAndPresent
 	{
 		private static FlyingScoreEffect _currentEffect = null!;
 
 // ReSharper disable InconsistentNaming
-		private static void Prefix(ref Vector3 targetPos, FlyingScoreEffect __instance)
+		internal static void Prefix(FlyingScoreEffect __instance, ref Vector3 targetPos)
 // ReSharper restore InconsistentNaming
 		{
-			if (Config.instance.useFixedPos)
+			if (ConfigProvider.CurrentConfig.UseFixedPos)
 			{
 				var transform = __instance.transform;
 
 				// Set current and target position to the desired fixed position
-				transform.position = new Vector3(Config.instance.fixedPosX, Config.instance.fixedPosY, Config.instance.fixedPosZ);
+				transform.position = ConfigProvider.CurrentConfig.FixedPos;
 				targetPos = transform.position;
 
 				// If there's an existing judgment effect, clear that first
@@ -49,14 +51,14 @@ namespace HitScoreVisualizer.Harmony_Patches
 		}
 
 // ReSharper disable InconsistentNaming
-		private static void Postfix(FlyingScoreEffect __instance, ref Color ____color, NoteCutInfo noteCutInfo)
+		internal static void Postfix(FlyingScoreEffect __instance, NoteCutInfo noteCutInfo)
 // ReSharper restore InconsistentNaming
 		{
 			void Judge(SaberSwingRatingCounter counter)
 			{
 				ScoreModel.RawScoreWithoutMultiplier(noteCutInfo, out var before, out var after, out var accuracy);
 				var total = before + after + accuracy;
-				Config.Judge(__instance, noteCutInfo, counter, total, before, after, accuracy);
+				JudgmentService.Judge(__instance, total, before, after, accuracy);
 
 				// If the counter is finished, remove our event from it
 				counter.didFinishEvent -= Judge;

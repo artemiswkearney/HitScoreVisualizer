@@ -2,10 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Text;
-using IPA.Utilities;
-using TMPro;
-using UnityEngine;
 
 namespace HitScoreVisualizer
 {
@@ -234,10 +230,10 @@ namespace HitScoreVisualizer
 
 		public static void Load()
 		{
-			Plugin.Logger.Info("Loading config...");
+			Plugin.logger.Info("Loading config...");
 			if (!File.Exists(FullPath))
 			{
-				Plugin.Logger.Info("Writing default config.");
+				Plugin.logger.Info("Writing default config.");
 				// if the config file doesn't exist, save the default one
 				ResetToDefault();
 				Save(true);
@@ -249,7 +245,7 @@ namespace HitScoreVisualizer
 				new JsonSerializerSettings {DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate});
 			if (!Validate(loaded))
 			{
-				Plugin.Logger.Info("Falling back to default config (file will not be overwritten)");
+				Plugin.logger.Info("Falling back to default config (file will not be overwritten)");
 				// don't try to modify the original default when disabling serialization
 				instance = DEFAULT_CONFIG.MemberwiseClone() as Config;
 				// since we couldn't read the existing config, don't overwrite it
@@ -341,7 +337,7 @@ namespace HitScoreVisualizer
 
 		public static void Save(bool force = false)
 		{
-			Plugin.Logger.Info("Writing file...");
+			Plugin.logger.Info("Writing file...");
 			if (instance.noSerialize && !force)
 			{
 				return;
@@ -350,14 +346,14 @@ namespace HitScoreVisualizer
 			File.WriteAllText(FullPath, JsonConvert.SerializeObject(instance,
 				Formatting.Indented,
 				new JsonSerializerSettings {DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate}));
-			Plugin.Logger.Info("File written.");
+			Plugin.logger.Info("File written.");
 		}
 
 		public static bool Validate(Config config)
 		{
 			if (TooNew(config))
 			{
-				Plugin.Logger.Info("Config is for a newer version of HitScoreVisualizer!");
+				Plugin.logger.Info("Config is for a newer version of HitScoreVisualizer!");
 				return false;
 			}
 
@@ -382,8 +378,8 @@ namespace HitScoreVisualizer
 		{
 			if (judgment.color.Length != 4)
 			{
-				Plugin.Logger.Warn($"Judgment \"{judgment.text}\" with threshold {judgment.threshold} has invalid color!");
-				Plugin.Logger.Warn("Make sure to include exactly 4 numbers for each judgment's color!");
+				Plugin.logger.Warn($"Judgment \"{judgment.text}\" with threshold {judgment.threshold} has invalid color!");
+				Plugin.logger.Warn("Make sure to include exactly 4 numbers for each judgment's color!");
 				return false;
 			}
 
@@ -415,149 +411,8 @@ namespace HitScoreVisualizer
 			instance = DEFAULT_CONFIG;
 		}
 
-		public static void Judge(FlyingScoreEffect scoreEffect, NoteCutInfo noteCutInfo, SaberSwingRatingCounter saberSwingRatingCounter, int score, int before, int after, int accuracy)
-		{
-			// as of 0.13, the TextMeshPro is private; use reflection to grab it out of a private field
-			var text = scoreEffect.GetField<TextMeshPro, FlyingScoreEffect>("_text");
-			// enable rich text
-			text.richText = true;
-			// disable word wrap, make sure full text displays
-			text.enableWordWrapping = false;
-			text.overflowMode = TextOverflowModes.Overflow;
 
 
-			var judgment = DEFAULT_JUDGMENT;
-			int index; // save in case we need to fade
-			for (index = 0; index < instance.judgments.Length; index++)
-			{
-				var j = instance.judgments[index];
-				if (score >= j.threshold)
-				{
-					judgment = j;
-					break;
-				}
-			}
 
-			Color color;
-			if (judgment.fade)
-			{
-				var fadeJudgment = instance.judgments[index - 1];
-				var baseColor = ToColor(judgment.color);
-				var fadeColor = ToColor(fadeJudgment.color);
-				var lerpDistance = Mathf.InverseLerp(judgment.threshold, fadeJudgment.threshold, score);
-				color = Color.Lerp(baseColor, fadeColor, lerpDistance);
-			}
-			else
-			{
-				color = ToColor(judgment.color);
-			}
-
-			scoreEffect.SetField("_color", color);
-
-			if (instance.displayMode == "format")
-			{
-				var formattedBuilder = new StringBuilder();
-				var formatString = judgment.text;
-				var nextPercentIndex = formatString.IndexOf('%');
-				while (nextPercentIndex != -1)
-				{
-					formattedBuilder.Append(formatString.Substring(0, nextPercentIndex));
-					if (formatString.Length == nextPercentIndex + 1)
-					{
-						formatString += " ";
-					}
-
-					var specifier = formatString[nextPercentIndex + 1];
-
-					switch (specifier)
-					{
-						case 'b':
-							formattedBuilder.Append(before);
-							break;
-						case 'c':
-							formattedBuilder.Append(accuracy);
-							break;
-						case 'a':
-							formattedBuilder.Append(after);
-							break;
-						case 'B':
-							formattedBuilder.Append(JudgeSegment(before, instance.beforeCutAngleJudgments));
-							break;
-						case 'C':
-							formattedBuilder.Append(JudgeSegment(accuracy, instance.accuracyJudgments));
-							break;
-						case 'A':
-							formattedBuilder.Append(JudgeSegment(after, instance.afterCutAngleJudgments));
-							break;
-						case 's':
-							formattedBuilder.Append(score);
-							break;
-						case 'p':
-							formattedBuilder.Append(string.Format("{0:0}", score / 115d * 100));
-							break;
-						case '%':
-							formattedBuilder.Append("%");
-							break;
-						case 'n':
-							formattedBuilder.Append("\n");
-							break;
-						default:
-							formattedBuilder.Append("%" + specifier);
-							break;
-					}
-
-					formatString = formatString.Remove(0, nextPercentIndex + 2);
-					nextPercentIndex = formatString.IndexOf('%');
-				}
-
-				formattedBuilder.Append(formatString);
-
-				text.text = formattedBuilder.ToString();
-				return;
-			}
-
-			if (instance.displayMode == "textOnly")
-			{
-				text.text = judgment.text;
-				return;
-			}
-
-			if (instance.displayMode == "numeric")
-			{
-				text.text = score.ToString();
-				return;
-			}
-
-			if (instance.displayMode == "scoreOnTop")
-			{
-				text.text = score + "\n" + judgment.text + "\n";
-				return;
-			}
-
-			text.text = judgment.text + "\n" + score + "\n";
-		}
-
-		public static Color ToColor(float[] rgba)
-		{
-			return new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
-		}
-
-		public static string JudgeSegment(int scoreForSegment, SegmentJudgment[] judgments)
-		{
-			if (judgments == null)
-			{
-				return string.Empty;
-			}
-
-			foreach (var j in judgments)
-			{
-				if (scoreForSegment >= j.threshold)
-				{
-					return j.text;
-				}
-			}
-
-			return string.Empty;
-		}
 	}
 }

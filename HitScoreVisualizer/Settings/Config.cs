@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using IPA.Config.Stores;
 using IPA.Config.Stores.Attributes;
 using IPA.Config.Stores.Converters;
-using SemVer;
+using Newtonsoft.Json;
 using UnityEngine;
+using Version = SemVer.Version;
 
 [assembly: InternalsVisibleTo(GeneratedStore.AssemblyVisibilityTarget)]
 namespace HitScoreVisualizer.Settings
@@ -16,21 +18,25 @@ namespace HitScoreVisualizer.Settings
 		// plugin, the file will be automatically converted. Conversion is not guaranteed to occur, or be
 
 		// accurate, across major versions.
-		[SerializedName("majorVersion")]
-		public virtual int MajorVersion { get; set; }
+		[NonNullable]
+		[JsonProperty("majorVersion")]
+		public virtual int MajorVersion { get; set; } = Plugin.Version.Major;
 
-		[SerializedName("minorVersion")]
-		public virtual int MinorVersion { get; set; }
+		[NonNullable]
+		[JsonProperty("minorVersion")]
+		public virtual int MinorVersion { get; set; } = Plugin.Version.Minor;
 
-		[SerializedName("patchVersion")]
-		public virtual int PatchVersion { get; set; }
+		[NonNullable]
+		[JsonProperty("patchVersion")]
+		public virtual int PatchVersion { get; set; } = Plugin.Version.Patch;
 
 		[Ignore]
+		[JsonIgnore]
 		internal Version Version => new Version(MajorVersion, MinorVersion, PatchVersion);
 
-		// If this is true, the config will be overwritten with the plugin's default settings after an
+		// If this is true, the config will be overwritten with the plugin' default settings after an
 		// update rather than being converted.
-		[SerializedName("isDefaultConfig")]
+		[JsonProperty("isDefaultConfig")]
 		public virtual bool IsDefaultConfig { get; set; }
 
 		// If set to "format", displays the judgment text, with the following format specifiers allowed:
@@ -47,52 +53,68 @@ namespace HitScoreVisualizer.Settings
 		// If set to "textOnly", displays only the judgment text.
 		// If set to "scoreOnTop", displays both (numeric score above judgment text).
 		// Otherwise, displays both (judgment text above numeric score).
-		[SerializedName("displayMode")]
+		[NonNullable]
+		[JsonProperty("displayMode")]
 		public virtual string DisplayMode { get; set; } = string.Empty;
 
 		// If enabled, judgments will appear and stay at (fixedPosX, fixedPosY, fixedPosZ) rather than moving as normal.
 		// Additionally, the previous judgment will disappear when a new one is created (so there won't be overlap).
-		[SerializedName("useFixedPos")]
+		[NonNullable]
+		[JsonProperty("useFixedPos")]
 		public virtual bool UseFixedPos { get; set; }
 
-		[SerializedName("fixedPosX")]
-		public virtual float FixedPosX { get; set; } = 0f;
+		[NonNullable]
+		[JsonProperty("fixedPosX")]
+		public virtual float? FixedPosX { get; set; } = 0f;
 
-		[SerializedName("fixedPosY")]
-		public virtual float FixedPosY { get; set; } = 0f;
+		[NonNullable]
+		[JsonProperty("fixedPosY")]
+		public virtual float? FixedPosY { get; set; } = 0f;
 
-		[SerializedName("fixedPosZ")]
-		public virtual float FixedPosZ { get; set; } = 0f;
+		[NonNullable]
+		[JsonProperty("fixedPosZ")]
+		public virtual float? FixedPosZ { get; set; } = 0f;
 
+		// Only call this when this was validated beforehand
 		[Ignore]
-		internal Vector3 FixedPos => new Vector3(FixedPosX, FixedPosY, FixedPosZ);
+		[JsonIgnore]
+		internal Vector3 FixedPos => new Vector3(FixedPosX!.Value, FixedPosY!.Value, FixedPosZ!.Value);
 
 		// If enabled, judgments will be updated more frequently. This will make score popups more accurate during a brief period before the note's score is finalized, at some cost of performance.
-		[SerializedName("doIntermediateUpdates")]
+		[NonNullable]
+		[JsonProperty("doIntermediateUpdates")]
 		public virtual bool DoIntermediateUpdates { get; set; }
 
 		// Order from highest threshold to lowest; the first matching judgment will be applied
 		[NonNullable]
-		[SerializedName("judgments")]
+		[JsonProperty("judgments")]
 		[UseConverter(typeof(ListConverter<Judgment>))]
-		public virtual List<Judgment> Judgments { get; set; } = new List<Judgment>();
+		public virtual List<Judgment> Judgments { get; set; }
 
 		// Judgments for the part of the swing before cutting the block (score is from 0-70).
 		// Format specifier: %B
-		[SerializedName("beforeCutAngleJudgments")]
+		[JsonProperty("beforeCutAngleJudgments")]
 		[UseConverter(typeof(ListConverter<JudgmentSegment>))]
-		public virtual List<JudgmentSegment> BeforeCutAngleJudgments { get; set; } = new List<JudgmentSegment>();
+		public virtual List<JudgmentSegment> BeforeCutAngleJudgments { get; set; }
 
 		// Judgments for the accuracy of the cut (how close to the center of the block the cut was, score is from 0-10).
 		// Format specifier: %C
 		[UseConverter]
-		[SerializedName("accuracyJudgments")]
-		public virtual List<JudgmentSegment> AccuracyJudgments { get; set; } = new List<JudgmentSegment>();
+		[JsonProperty("accuracyJudgments")]
+		public virtual List<JudgmentSegment> AccuracyJudgments { get; set; }
 
 		// Judgments for the part of the swing after cutting the block (score is from 0-30).
 		// Format specifier: %A
 		[UseConverter]
-		[SerializedName("afterCutAngleJudgments")]
-		public virtual List<JudgmentSegment> AfterCutAngleJudgments { get; set; } = new List<JudgmentSegment>();
+		[JsonProperty("afterCutAngleJudgments")]
+		public virtual List<JudgmentSegment> AfterCutAngleJudgments { get; set; }
+
+		public virtual void Changed()
+		{
+			// this is called whenever one of the virtual properties is changed
+			// can be called to signal that the content has been changed
+		}
+
+		public virtual IDisposable ChangeTransaction => null!;
 	}
 }

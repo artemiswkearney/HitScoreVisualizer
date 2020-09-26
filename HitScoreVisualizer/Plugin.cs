@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using System.Reflection;
 using HitScoreVisualizer.Extensions;
+using HitScoreVisualizer.Services;
 using IPA;
 using IPA.Loader;
 using IPA.Logging;
@@ -18,16 +19,18 @@ namespace HitScoreVisualizer
 		private static string? _name;
 		private static Version? _version;
 
-		internal static Logger Logger;
+		internal static Logger logger = null!;
 
 		public static string Name => _name ??= _metadata?.Name ?? Assembly.GetExecutingAssembly().GetName().Name;
 		public static Version Version => _version ??= _metadata?.Version ?? Assembly.GetExecutingAssembly().GetName().Version.ToSemVerVersion();
 
 		[Init]
-		public void Init(Logger logger, PluginMetadata pluginMetadata)
+		public void Init(Logger log, PluginMetadata pluginMetadata)
 		{
-			Logger = logger;
+			logger = log;
 			_metadata = pluginMetadata;
+
+			ConfigProvider.Load();
 		}
 
 		[OnEnable]
@@ -35,8 +38,6 @@ namespace HitScoreVisualizer
 		{
 			_harmonyInstance = new Harmony(HARMONY_ID);
 			_harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
-
-			Config.Load();
 		}
 
 		[OnDisable]
