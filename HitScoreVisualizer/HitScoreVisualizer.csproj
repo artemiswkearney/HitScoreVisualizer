@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
 		<OutputType>Library</OutputType>
-		<LangVersion>8</LangVersion>
+		<LangVersion>9</LangVersion>
 		<Nullable>enable</Nullable>
 		<OutDir>$(ProjectDir)bin\$(Configuration)</OutDir>
 		<ModVersion>2.4.3</ModVersion>
