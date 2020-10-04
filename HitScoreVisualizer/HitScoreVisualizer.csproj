@@ -41,6 +41,14 @@
 			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\Main.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="HMLib">
+			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\HMLib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="HMUI">
+			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\HMUI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 		<Reference Include="0Harmony">
 			<HintPath>$(GameDirPath)Libs\0Harmony.dll</HintPath>
 			<Private>False</Private>
@@ -56,6 +64,18 @@
 		<Reference Include="BSML">
 			<HintPath>$(GameDirPath)Plugins\BSML.dll</HintPath>
 			<Private>False</Private>
+		</Reference>
+		<Reference Include="Zenject">
+			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\Zenject.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Zenject-usage">
+			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\Zenject-usage.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="SiraUtil">
+			<HintPath>$(GameDirPath)Plugins\SiraUtil.dll</HintPath>
+			<Private>false</Private>
 		</Reference>
 	</ItemGroup>
 
