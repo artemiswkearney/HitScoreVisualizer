@@ -5,6 +5,7 @@
 		<OutputType>Library</OutputType>
 		<LangVersion>9</LangVersion>
 		<Nullable>enable</Nullable>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<OutDir>$(ProjectDir)bin\$(Configuration)</OutDir>
 		<ModVersion>2.4.3</ModVersion>
 		<AssemblyVersion>$(ModVersion)</AssemblyVersion>
