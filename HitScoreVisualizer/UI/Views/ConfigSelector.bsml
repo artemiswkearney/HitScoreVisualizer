@@ -60,17 +60,21 @@
 
 	</horizontal>
 
-	<horizontal pad-left="4"
-				anchor-pos-y="-37.5"
-				vertical-fit="PreferredSize"
-				horizontal-fit="Unconstrained"
-				child-align="LowerLeft"
-				child-expand-width='false'
-				child-control-width='true'
-				spacing="2"
-				active="~loading-available-configs">
-		<loading-indicator preserve-aspect='true' pref-width='4' pref-height='4' source='#LoadingIndicator'/>
-		<text text="Loading..."/>
-	</horizontal>
+	<stack pad-left="4"
+		   anchor-pos-y="-37.5"
+		   vertical-fit="PreferredSize"
+		   horizontal-fit="Unconstrained">
+
+		<horizontal child-align="LowerLeft"
+					child-expand-width='false'
+					child-control-width='true'
+					spacing="2"
+					active="~loading-available-configs">
+			<loading-indicator preserve-aspect='true' pref-width='4' pref-height='4' source='#LoadingIndicator'/>
+			<text text="Loading..."/>
+		</horizontal>
+
+		<text text="~config-loaded-text" active="~has-loaded-available-configs"/>
+	</stack>
 
 </bg>

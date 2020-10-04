@@ -42,11 +42,17 @@ namespace HitScoreVisualizer.UI
 		[UIValue("loading-available-configs")]
 		internal bool LoadingConfigs { get; private set; }
 
+		[UIValue("has-loaded-available-configs")]
+		internal bool HasLoadedConfigs => !LoadingConfigs;
+
 		[UIValue("is-valid-config-selected")]
 		internal bool CanConfigGetSelected => _selectedConfigFileInfo?.ConfigPath != _configProvider.CurrentConfigPath && _configProvider.ConfigSelectable(_selectedConfigFileInfo?.State);
 
 		[UIValue("has-config-loaded")]
 		internal bool HasConfigCurrently => !string.IsNullOrWhiteSpace(_configProvider.CurrentConfigPath);
+
+		[UIValue("config-loaded-text")]
+		internal string LoadedConfigText => $"Currently loaded config: <size=80%>{(HasConfigCurrently ? Path.GetFileNameWithoutExtension(_configProvider.CurrentConfigPath) : "None")}";
 
 		[UIAction("config-Selected")]
 		internal void Select(TableView tableView, object @object)
@@ -68,6 +74,7 @@ namespace HitScoreVisualizer.UI
 			{
 				_configProvider.SelectUserConfig(_selectedConfigFileInfo);
 				NotifyPropertyChanged(nameof(HasConfigCurrently));
+				NotifyPropertyChanged(nameof(LoadedConfigText));
 			}
 		}
 
@@ -89,6 +96,7 @@ namespace HitScoreVisualizer.UI
 
 				_configProvider.UnselectUserConfig();
 				NotifyPropertyChanged(nameof(HasConfigCurrently));
+				NotifyPropertyChanged(nameof(LoadedConfigText));
 			}
 		}
 
@@ -135,6 +143,7 @@ namespace HitScoreVisualizer.UI
 
 			LoadingConfigs = true;
 			NotifyPropertyChanged(nameof(LoadingConfigs));
+			NotifyPropertyChanged(nameof(HasLoadedConfigs));
 
 			var intermediateConfigs = (await _configProvider.ListAvailableConfigs())
 				.OrderByDescending(x => x.State)
@@ -155,6 +164,7 @@ namespace HitScoreVisualizer.UI
 
 				LoadingConfigs = false;
 				NotifyPropertyChanged(nameof(LoadingConfigs));
+				NotifyPropertyChanged(nameof(HasLoadedConfigs));
 			}).ConfigureAwait(false);
 		}
 	}
