@@ -10,13 +10,16 @@ namespace HitScoreVisualizer.Services
 {
 	internal static class JudgmentService
 	{
-		private static readonly Judgment DefaultJudgment = new Judgment {Threshold = 0, Text = "", Color = new List<float> {1f, 1f, 1f, 1f}, Fade = false};
-		private static readonly JudgmentSegment DefaultSegmentJudgment = new JudgmentSegment {Threshold = 0, Text = ""};
-
 		private static readonly FieldAccessor<FlyingScoreEffect, TextMeshPro>.Accessor FlyingScoreEffectText = FieldAccessor<FlyingScoreEffect, TextMeshPro>.GetAccessor("_text");
 
 		public static void Judge(FlyingScoreEffect scoreEffect, int score, int before, int after, int accuracy)
 		{
+			var instance = ConfigProvider.CurrentConfig;
+			if (instance == null)
+			{
+				return;
+			}
+
 			// as of 0.13, the TextMeshPro is private; use reflection to grab it out of a private field
 			var text = FlyingScoreEffectText(ref scoreEffect);
 			// enable rich text
@@ -25,12 +28,9 @@ namespace HitScoreVisualizer.Services
 			text.enableWordWrapping = false;
 			text.overflowMode = TextOverflowModes.Overflow;
 
-			var instance = ConfigProvider.CurrentConfig;
-
-
-			var judgment = DefaultJudgment;
+			var judgment = Judgment.Default;
 			int index; // save in case we need to fade
-			for (index = 0; index < instance.Judgments.Count; index++)
+			for (index = 0; index < instance.Judgments!.Count; index++)
 			{
 				var j = instance.Judgments[index];
 				if (score >= j.Threshold)
@@ -67,7 +67,7 @@ namespace HitScoreVisualizer.Services
 			};
 		}
 
-		private static string DisplayModeFormat(int score, int before, int after, int accuracy, Judgment judgment, Settings.Config instance)
+		private static string DisplayModeFormat(int score, int before, int after, int accuracy, Judgment judgment, Configuration instance)
 		{
 			var formattedBuilder = new StringBuilder();
 			var formatString = judgment.Text;

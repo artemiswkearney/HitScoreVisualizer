@@ -15,7 +15,7 @@ namespace HitScoreVisualizer.Harmony_Patches
 		internal static void Prefix(FlyingScoreEffect __instance, ref Vector3 targetPos)
 // ReSharper restore InconsistentNaming
 		{
-			if (ConfigProvider.CurrentConfig.UseFixedPos)
+			if (ConfigProvider.CurrentConfig?.UseFixedPos ?? false)
 			{
 				var transform = __instance.transform;
 
@@ -41,15 +41,6 @@ namespace HitScoreVisualizer.Harmony_Patches
 			}
 		}
 
-		private static void HandleEffectDidFinish(FlyingObjectEffect effect)
-		{
-			effect.didFinishEvent -= HandleEffectDidFinish;
-			if (_currentEffect == effect)
-			{
-				_currentEffect = null!;
-			}
-		}
-
 // ReSharper disable InconsistentNaming
 		internal static void Postfix(FlyingScoreEffect __instance, NoteCutInfo noteCutInfo)
 // ReSharper restore InconsistentNaming
@@ -67,6 +58,15 @@ namespace HitScoreVisualizer.Harmony_Patches
 			// Apply judgments a total of twice - once when the effect is created, once when it finishes.
 			Judge(noteCutInfo.swingRatingCounter);
 			noteCutInfo.swingRatingCounter.didFinishEvent += Judge;
+		}
+
+		private static void HandleEffectDidFinish(FlyingObjectEffect effect)
+		{
+			effect.didFinishEvent -= HandleEffectDidFinish;
+			if (_currentEffect == effect)
+			{
+				_currentEffect = null!;
+			}
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using System.Reflection;
 using HitScoreVisualizer.Extensions;
-using HitScoreVisualizer.Services;
+using HitScoreVisualizer.Installers;
 using IPA;
 using IPA.Loader;
 using IPA.Logging;
@@ -29,13 +29,13 @@ namespace HitScoreVisualizer
 		{
 			LoggerInstance = log;
 			_metadata = pluginMetadata;
-
-			ConfigProvider.Load();
 		}
 
 		[OnEnable]
 		public void OnEnable()
 		{
+			SiraUtil.Zenject.Installer.RegisterAppInstaller<AppInstaller>();
+
 			_harmonyInstance = new Harmony(HARMONY_ID);
 			_harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
 		}
@@ -43,6 +43,8 @@ namespace HitScoreVisualizer
 		[OnDisable]
 		public void OnDisable()
 		{
+			SiraUtil.Zenject.Installer.UnregisterAppInstaller<AppInstaller>();
+
 			_harmonyInstance?.UnpatchAll(HARMONY_ID);
 		}
 	}

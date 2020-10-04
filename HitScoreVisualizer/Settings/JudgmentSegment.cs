@@ -1,16 +1,19 @@
-﻿using IPA.Config.Stores.Attributes;
+﻿using Newtonsoft.Json;
 
 namespace HitScoreVisualizer.Settings
 {
 	internal class JudgmentSegment
 	{
+		[JsonIgnore]
+		internal static JudgmentSegment Default { get; } = new JudgmentSegment {Threshold = 0, Text = ""};
+
 		// This judgment will be applied only when the appropriate part of the swing contributes score >= this number.
 		// If no judgment can be applied, the judgment for this segment will be "" (the empty string).
-		[SerializedName("threshold")]
-		public virtual int Threshold { get; set; } = 0;
+		[JsonProperty("threshold")]
+		public int? Threshold { get; set; }
 
 		// The text to replace the appropriate judgment specifier with (%B, %C, %A) when this judgment applies.
-		[SerializedName("text")]
-		public virtual string? Text { get; set; }
+		[JsonProperty("text")]
+		public string? Text { get; set; }
 	}
 }

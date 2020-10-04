@@ -12,7 +12,7 @@ namespace HitScoreVisualizer.Harmony_Patches
 // ReSharper enable InconsistentNaming
 
 		{
-			if (ConfigProvider.CurrentConfig.DoIntermediateUpdates)
+			if (ConfigProvider.CurrentConfig?.DoIntermediateUpdates ?? false)
 			{
 				ScoreModel.RawScoreWithoutMultiplier(____noteCutInfo, out var before, out var after, out var accuracy);
 				var total = before + after + accuracy;
