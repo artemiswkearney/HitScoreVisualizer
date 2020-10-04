@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -104,23 +103,12 @@ namespace HitScoreVisualizer.UI
 		{
 			base.DidActivate(firstActivation, type);
 
-			Plugin.LoggerInstance.Info("DidActivate");
-
-			try
-			{
-				await LoadInternal().ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				Plugin.LoggerInstance.Error(ex);
-			}
+			await LoadInternal().ConfigureAwait(false);
 		}
 
 		protected override void DidDeactivate(DeactivationType deactivationType)
 		{
 			base.DidDeactivate(deactivationType);
-
-			Plugin.LoggerInstance.Info("DidDeactivate");
 
 			AvailableConfigs.Clear();
 
@@ -138,7 +126,6 @@ namespace HitScoreVisualizer.UI
 			if (AvailableConfigs.Count > 0)
 			{
 				AvailableConfigs.Clear();
-				// await UnityMainThreadTaskScheduler.Factory.StartNew(() => customListTableData.tableView.ReloadData()).ConfigureAwait(false);
 			}
 
 			LoadingConfigs = true;
