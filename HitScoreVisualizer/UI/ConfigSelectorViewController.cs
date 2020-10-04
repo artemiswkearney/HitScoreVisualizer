@@ -42,6 +42,9 @@ namespace HitScoreVisualizer.UI
 		[UIValue("is-valid-config-selected")]
 		internal bool CanConfigGetSelected => _selectedConfigFileInfo?.ConfigPath != _configProvider.CurrentConfigPath && _configProvider.ConfigSelectable(_selectedConfigFileInfo?.State);
 
+		[UIValue("has-config-loaded")]
+		internal bool HasConfigCurrently => !string.IsNullOrWhiteSpace(_configProvider.CurrentConfigPath);
+
 		[UIAction("config-Selected")]
 		internal void Select(TableView tableView, object @object)
 		{
@@ -61,6 +64,28 @@ namespace HitScoreVisualizer.UI
 			if (CanConfigGetSelected)
 			{
 				_configProvider.SelectUserConfig(_selectedConfigFileInfo);
+				NotifyPropertyChanged(nameof(HasConfigCurrently));
+			}
+		}
+
+		[UIAction("unpick-config")]
+		internal void UnpickConfig()
+		{
+			if (HasConfigCurrently)
+			{
+				UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+				{
+					if (customListTableData == null)
+					{
+						Plugin.LoggerInstance.Warn($"{nameof(customListTableData)} is null.");
+						return;
+					}
+
+					customListTableData.tableView.ClearSelection();
+				});
+
+				_configProvider.UnselectUserConfig();
+				NotifyPropertyChanged(nameof(HasConfigCurrently));
 			}
 		}
 

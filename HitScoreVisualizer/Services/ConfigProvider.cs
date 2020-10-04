@@ -122,6 +122,12 @@ namespace HitScoreVisualizer.Services
 			_hsvConfig.ConfigFilePath = configFileInfo.ConfigPath;
 		}
 
+		internal void UnselectUserConfig()
+		{
+			CurrentConfig = null;
+			_hsvConfig.ConfigFilePath = null;
+		}
+
 		private async Task<Configuration?> LoadConfig(string path)
 		{
 			try

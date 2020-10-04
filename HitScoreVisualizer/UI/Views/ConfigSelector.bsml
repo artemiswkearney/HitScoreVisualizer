@@ -47,6 +47,15 @@
 					text='Select'
 					interactable='~is-valid-config-selected'
 					on-click='pick-config'/>
+
+			<button pref-width='28'
+					word-wrapping='false'
+					text='Reset to none'
+					face-color="#BD2881"
+					stroke-color="#BD2881"
+					glow-color="#BD2881"
+					interactable='~has-config-loaded'
+					on-click='unpick-config'/>
 		</vertical>
 
 	</horizontal>
