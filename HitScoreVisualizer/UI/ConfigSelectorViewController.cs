@@ -39,6 +39,9 @@ namespace HitScoreVisualizer.UI
 		[UIValue("available-configs")]
 		internal List<object> AvailableConfigs { get; }
 
+		[UIValue("loading-available-configs")]
+		internal bool LoadingConfigs { get; private set; }
+
 		[UIValue("is-valid-config-selected")]
 		internal bool CanConfigGetSelected => _selectedConfigFileInfo?.ConfigPath != _configProvider.CurrentConfigPath && _configProvider.ConfigSelectable(_selectedConfigFileInfo?.State);
 
@@ -130,6 +133,9 @@ namespace HitScoreVisualizer.UI
 				// await UnityMainThreadTaskScheduler.Factory.StartNew(() => customListTableData.tableView.ReloadData()).ConfigureAwait(false);
 			}
 
+			LoadingConfigs = true;
+			NotifyPropertyChanged(nameof(LoadingConfigs));
+
 			var intermediateConfigs = (await _configProvider.ListAvailableConfigs())
 				.OrderByDescending(x => x.State)
 				.ThenBy(x => x.ConfigName)
@@ -146,6 +152,9 @@ namespace HitScoreVisualizer.UI
 				{
 					customListTableData.tableView.SelectCellWithIdx(currentConfigIndex, true);
 				}
+
+				LoadingConfigs = false;
+				NotifyPropertyChanged(nameof(LoadingConfigs));
 			}).ConfigureAwait(false);
 		}
 	}
