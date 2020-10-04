@@ -35,6 +35,7 @@ namespace HitScoreVisualizer
 		public void OnEnable()
 		{
 			SiraUtil.Zenject.Installer.RegisterAppInstaller<AppInstaller>();
+			SiraUtil.Zenject.Installer.RegisterMenuInstaller<Installers.MenuInstaller>();
 
 			_harmonyInstance = new Harmony(HARMONY_ID);
 			_harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
@@ -44,6 +45,7 @@ namespace HitScoreVisualizer
 		public void OnDisable()
 		{
 			SiraUtil.Zenject.Installer.UnregisterAppInstaller<AppInstaller>();
+			SiraUtil.Zenject.Installer.UnregisterMenuInstaller<Installers.MenuInstaller>();
 
 			_harmonyInstance?.UnpatchAll(HARMONY_ID);
 		}

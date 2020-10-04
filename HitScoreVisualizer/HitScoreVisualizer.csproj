@@ -85,6 +85,7 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="manifest.json"/>
+		<EmbeddedResource Include="UI\Views\*.bsml"/>
 	</ItemGroup>
 
 	<Target Name="CopyToPlugins" AfterTargets="AfterBuild">

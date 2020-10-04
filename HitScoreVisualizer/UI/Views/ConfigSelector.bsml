@@ -1,0 +1,53 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+
+	<horizontal pad-top='12'
+				pad-bottom='12'
+				spacing='1'>
+		<vertical spacing='1'>
+			<page-button direction='Up'
+						 event-click='configs-list#PageUp'/>
+
+			<custom-list id='configs-list'
+						 pref-width="110"
+						 contents="available-configs"
+						 cell-size="10"
+						 pref-height="55"
+						 select-cell='config-Selected'>
+				<stack>
+					<bg bg="round-rect-panel-shadow" bg-color="#2881BD" tags='hovered'/>
+					<bg bg="round-rect-panel-shadow" bg-color="#BD2881" tags='selected'/>
+					<vertical horizontal-fit='Unconstrained' spacing="-2" child-align="MiddleLeft">
+						<text text="~config-name" font-size="5"/>
+						<text text="~config-description" font-size="3.5"/>
+					</vertical>
+				</stack>
+			</custom-list>
+
+			<page-button direction='Down'
+						 event-click='configs-list#PageDown'/>
+		</vertical>
+
+		<vertical vertical-fit='Unconstrained'
+				  preferred-height='50'
+				  child-align='MiddleCenter'
+				  child-expand-height='false'
+				  child-control-height='true'
+				  spacing="2">
+
+			<button pref-width='28'
+					word-wrapping='false'
+					child-align='MiddleCenter'
+					text='Refresh'
+					hover-hint="Refreshes the list"
+					on-click='reload-list'/>
+
+			<button pref-width='28'
+					word-wrapping='false'
+					text='Select'
+					interactable='~is-valid-config-selected'
+					on-click='pick-config'/>
+		</vertical>
+
+	</horizontal>
+</bg>
