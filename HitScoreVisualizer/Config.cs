@@ -230,10 +230,10 @@ namespace HitScoreVisualizer
 
 		public static void Load()
 		{
-			Plugin.logger.Info("Loading config...");
+			Plugin.LoggerInstance.Info("Loading config...");
 			if (!File.Exists(FullPath))
 			{
-				Plugin.logger.Info("Writing default config.");
+				Plugin.LoggerInstance.Info("Writing default config.");
 				// if the config file doesn't exist, save the default one
 				ResetToDefault();
 				Save(true);
@@ -245,7 +245,7 @@ namespace HitScoreVisualizer
 				new JsonSerializerSettings {DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate});
 			if (!Validate(loaded))
 			{
-				Plugin.logger.Info("Falling back to default config (file will not be overwritten)");
+				Plugin.LoggerInstance.Info("Falling back to default config (file will not be overwritten)");
 				// don't try to modify the original default when disabling serialization
 				instance = DEFAULT_CONFIG.MemberwiseClone() as Config;
 				// since we couldn't read the existing config, don't overwrite it
@@ -337,7 +337,7 @@ namespace HitScoreVisualizer
 
 		public static void Save(bool force = false)
 		{
-			Plugin.logger.Info("Writing file...");
+			Plugin.LoggerInstance.Info("Writing file...");
 			if (instance.noSerialize && !force)
 			{
 				return;
@@ -346,14 +346,14 @@ namespace HitScoreVisualizer
 			File.WriteAllText(FullPath, JsonConvert.SerializeObject(instance,
 				Formatting.Indented,
 				new JsonSerializerSettings {DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate}));
-			Plugin.logger.Info("File written.");
+			Plugin.LoggerInstance.Info("File written.");
 		}
 
 		public static bool Validate(Config config)
 		{
 			if (TooNew(config))
 			{
-				Plugin.logger.Info("Config is for a newer version of HitScoreVisualizer!");
+				Plugin.LoggerInstance.Info("Config is for a newer version of HitScoreVisualizer!");
 				return false;
 			}
 
@@ -378,8 +378,8 @@ namespace HitScoreVisualizer
 		{
 			if (judgment.color.Length != 4)
 			{
-				Plugin.logger.Warn($"Judgment \"{judgment.text}\" with threshold {judgment.threshold} has invalid color!");
-				Plugin.logger.Warn("Make sure to include exactly 4 numbers for each judgment's color!");
+				Plugin.LoggerInstance.Warn($"Judgment \"{judgment.text}\" with threshold {judgment.threshold} has invalid color!");
+				Plugin.LoggerInstance.Warn("Make sure to include exactly 4 numbers for each judgment's color!");
 				return false;
 			}
 

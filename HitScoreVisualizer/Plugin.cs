@@ -19,7 +19,7 @@ namespace HitScoreVisualizer
 		private static string? _name;
 		private static Version? _version;
 
-		internal static Logger logger = null!;
+		internal static Logger LoggerInstance { get; private set; } = null!;
 
 		public static string Name => _name ??= _metadata?.Name ?? Assembly.GetExecutingAssembly().GetName().Name;
 		public static Version Version => _version ??= _metadata?.Version ?? Assembly.GetExecutingAssembly().GetName().Version.ToSemVerVersion();
@@ -27,7 +27,7 @@ namespace HitScoreVisualizer
 		[Init]
 		public void Init(Logger log, PluginMetadata pluginMetadata)
 		{
-			logger = log;
+			LoggerInstance = log;
 			_metadata = pluginMetadata;
 
 			ConfigProvider.Load();

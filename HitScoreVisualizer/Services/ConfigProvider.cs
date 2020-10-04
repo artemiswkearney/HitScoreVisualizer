@@ -14,7 +14,6 @@ namespace HitScoreVisualizer.Services
 
 		internal static void Load()
 		{
-			Plugin.logger.Info("Loading config...");
 
 
 			if (!Directory.Exists(HsvConfigsFolderPath))
@@ -53,7 +52,6 @@ namespace HitScoreVisualizer.Services
 		{
 			if (TooNew(config))
 			{
-				Plugin.logger.Info("Config is for a newer version of HitScoreVisualizer!");
 				return false;
 			}
 
@@ -73,8 +71,8 @@ namespace HitScoreVisualizer.Services
 		{
 			if (judgment.Color.Count != 4)
 			{
-				Plugin.logger.Warn($"Judgment \"{judgment.Text}\" with threshold {judgment.Threshold} has invalid color!");
-				Plugin.logger.Warn("Make sure to include exactly 4 numbers for each judgment's color!");
+				Plugin.LoggerInstance.Warn($"Judgment \"{judgment.Text}\" with threshold {judgment.Threshold} has invalid color!");
+				Plugin.LoggerInstance.Warn("Make sure to include exactly 4 numbers for each judgment's color!");
 				return false;
 			}
 
