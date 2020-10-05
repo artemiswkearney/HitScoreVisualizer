@@ -71,7 +71,7 @@ namespace HitScoreVisualizer.Services
 
 			var configFileInfo = new ConfigFileInfo(Path.GetFileNameWithoutExtension(_hsvConfig.ConfigFilePath), _hsvConfig.ConfigFilePath)
 			{
-				Configuration = userConfig, State = GetConfigState(userConfig)
+				Configuration = userConfig, State = GetConfigState(userConfig, _hsvConfig.ConfigFilePath)
 			};
 
 			SelectUserConfig(configFileInfo);
@@ -87,7 +87,7 @@ namespace HitScoreVisualizer.Services
 			foreach (var configInfo in configFileInfoList)
 			{
 				configInfo.Configuration = await LoadConfig(configInfo.ConfigPath);
-				configInfo.State = GetConfigState(configInfo.Configuration);
+				configInfo.State = GetConfigState(configInfo.Configuration, configInfo.ConfigName);
 			}
 
 			return configFileInfoList;
@@ -144,7 +144,7 @@ namespace HitScoreVisualizer.Services
 			}
 		}
 
-		private ConfigState GetConfigState(Configuration? configuration)
+		private ConfigState GetConfigState(Configuration? configuration, string configName)
 		{
 			if (configuration?.Version == null)
 			{
@@ -161,7 +161,7 @@ namespace HitScoreVisualizer.Services
 				return ConfigState.Incompatible;
 			}
 
-			if (!Validate(configuration))
+			if (!Validate(configuration!, configName))
 			{
 				return ConfigState.ValidationFailed;
 			}
@@ -169,22 +169,125 @@ namespace HitScoreVisualizer.Services
 			return configuration.Version <= MaximumMigrationNeededVersion ? ConfigState.NeedsMigration : ConfigState.Compatible;
 		}
 
-		private static bool Validate(Configuration? configuration)
+		private static bool Validate(Configuration configuration, string configName)
 		{
-			if (configuration == null || (!configuration.Judgments?.Any() ?? true))
+			if (!configuration.Judgments?.Any() ?? true)
+			{
+				Plugin.LoggerInstance.Warn($"No judgments found for {configName}");
+				return false;
+			}
+
+			if (!ValidateJudgments(configuration, configName))
 			{
 				return false;
 			}
 
-			return configuration.Judgments!.All(ValidateJudgment);
+			if (configuration.BeforeCutAngleJudgments != null)
+			{
+				configuration.BeforeCutAngleJudgments = configuration.BeforeCutAngleJudgments.OrderByDescending(x => x.Threshold).ToList();
+				if (!ValidateJudgmentSegment(configuration.BeforeCutAngleJudgments, configName))
+				{
+					return false;
+				}
+			}
+
+			if (configuration.AccuracyJudgments != null)
+			{
+				configuration.AccuracyJudgments = configuration.AccuracyJudgments.OrderByDescending(x => x.Threshold).ToList();
+				if (!ValidateJudgmentSegment(configuration.AccuracyJudgments, configName))
+				{
+					return false;
+				}
+			}
+
+			if (configuration.AfterCutAngleJudgments != null)
+			{
+				configuration.AfterCutAngleJudgments = configuration.AfterCutAngleJudgments.OrderByDescending(x => x.Threshold).ToList();
+				if (!ValidateJudgmentSegment(configuration.AfterCutAngleJudgments, configName))
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
-		private static bool ValidateJudgment(Judgment judgment)
+		private static bool ValidateJudgments(Configuration configuration, string configName)
+		{
+			configuration.Judgments = configuration.Judgments!.OrderByDescending(x => x.Threshold).ToList();
+			var prevJudgement = configuration.Judgments.First();
+			if (prevJudgement.Fade)
+			{
+				prevJudgement.Fade = false;
+			}
+
+			if (!ValidateJudgmentColor(prevJudgement, configName))
+			{
+				Plugin.LoggerInstance.Warn($"Judgment entry for threshold {prevJudgement.Threshold} has invalid color in {configName}");
+				return false;
+			}
+
+			if (configuration.Judgments.Count > 1)
+			{
+				for (var i = 1; i < configuration.Judgments.Count; i++)
+				{
+					var currentJudgement = configuration.Judgments[i];
+					if (prevJudgement.Threshold != currentJudgement.Threshold)
+					{
+						if (!ValidateJudgmentColor(currentJudgement, configName))
+						{
+							Plugin.LoggerInstance.Warn($"Judgment entry for threshold {currentJudgement.Threshold} has invalid color in {configName}");
+							return false;
+						}
+
+						prevJudgement = currentJudgement;
+						continue;
+					}
+
+					Plugin.LoggerInstance.Warn($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		private static bool ValidateJudgmentColor(Judgment judgment, string configName)
 		{
 			if (judgment.Color.Count != 4)
 			{
-				Plugin.LoggerInstance.Warn($"Judgment \"{judgment.Text}\" with threshold {judgment.Threshold} has invalid color!");
-				Plugin.LoggerInstance.Warn("Make sure to include exactly 4 numbers for each judgment's color!");
+				Plugin.LoggerInstance.Warn($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers for each judgment's color!");
+				return false;
+			}
+
+			if (judgment.Color.All(x => x >= 0f && x <= 1f))
+			{
+				return true;
+			}
+
+			Plugin.LoggerInstance
+				.Warn($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers between 0 and 1 for each judgment's color!");
+			return false;
+		}
+
+		private static bool ValidateJudgmentSegment(List<JudgmentSegment> segments, string configName)
+		{
+			if (segments.Count <= 1)
+			{
+				return true;
+			}
+
+			var prevJudgementSegment = segments.First();
+			for (var i = 1; i < segments.Count; i++)
+			{
+				var currentJudgement = segments[i];
+				if (prevJudgementSegment.Threshold != currentJudgement.Threshold)
+				{
+					prevJudgementSegment = currentJudgement;
+					continue;
+				}
+
+				Plugin.LoggerInstance.Warn($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
 				return false;
 			}
 

@@ -10,7 +10,7 @@ namespace HitScoreVisualizer.Settings
 		// This judgment will be applied only when the appropriate part of the swing contributes score >= this number.
 		// If no judgment can be applied, the judgment for this segment will be "" (the empty string).
 		[JsonProperty("threshold")]
-		public int? Threshold { get; set; }
+		public int Threshold { get; set; }
 
 		// The text to replace the appropriate judgment specifier with (%B, %C, %A) when this judgment applies.
 		[JsonProperty("text")]
