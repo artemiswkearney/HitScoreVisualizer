@@ -46,10 +46,8 @@ namespace HitScoreVisualizer.Services
 
 		public async void Initialize()
 		{
-			if (!Directory.Exists(_hsvConfigsFolderPath))
+			if (CreateHsvConfigsFolderIfYeetedByPlayer())
 			{
-				Plugin.LoggerInstance.Debug("Creating configs folder");
-				Directory.CreateDirectory(_hsvConfigsFolderPath);
 				await SaveConfig(Path.Combine(_hsvConfigsFolderPath, "HitScoreVisualizerConfig-default.json"), Configuration.Default).ConfigureAwait(false);
 			}
 
@@ -131,6 +129,8 @@ namespace HitScoreVisualizer.Services
 
 		private async Task<Configuration?> LoadConfig(string path)
 		{
+			CreateHsvConfigsFolderIfYeetedByPlayer(false);
+
 			try
 			{
 				using var fileStream = File.OpenRead(path);
@@ -147,6 +147,8 @@ namespace HitScoreVisualizer.Services
 
 		private async Task SaveConfig(string path, Configuration configuration)
 		{
+			CreateHsvConfigsFolderIfYeetedByPlayer(false);
+
 			try
 			{
 				using var fileStream = File.OpenWrite(path);
@@ -357,6 +359,23 @@ namespace HitScoreVisualizer.Services
 			configuration.DoIntermediateUpdates = true;
 
 			return true;
+		}
+
+		private bool CreateHsvConfigsFolderIfYeetedByPlayer(bool calledOnInit = true)
+		{
+			if (!Directory.Exists(_hsvConfigsFolderPath))
+			{
+				if (!calledOnInit)
+				{
+					Plugin.LoggerInstance.Warn("*sigh* Don't yeet the HSV configs folder while the game is running... Recreating it again...");
+				}
+
+				Directory.CreateDirectory(_hsvConfigsFolderPath);
+
+				return true;
+			}
+
+			return false;
 		}
 	}
 }
