@@ -42,16 +42,17 @@ namespace HitScoreVisualizer.Services
 
 			MinimumMigratableVersion = _migrationActions.Keys.Min();
 			MaximumMigrationNeededVersion = _migrationActions.Keys.Max();
-
-			Plugin.LoggerInstance.Debug("Creating configs folder");
-			if (!Directory.Exists(_hsvConfigsFolderPath))
-			{
-				Directory.CreateDirectory(_hsvConfigsFolderPath);
-			}
 		}
 
 		public async void Initialize()
 		{
+			if (!Directory.Exists(_hsvConfigsFolderPath))
+			{
+				Plugin.LoggerInstance.Debug("Creating configs folder");
+				Directory.CreateDirectory(_hsvConfigsFolderPath);
+				await SaveConfig(Path.Combine(_hsvConfigsFolderPath, "HitScoreVisualizerConfig-default.json"), Configuration.Default).ConfigureAwait(false);
+			}
+
 			if (_hsvConfig.ConfigFilePath == null)
 			{
 				return;
@@ -141,6 +142,22 @@ namespace HitScoreVisualizer.Services
 			{
 				// Expected behaviour when file isn't an actual hsv config file...
 				return null!;
+			}
+		}
+
+		private async Task SaveConfig(string path, Configuration configuration)
+		{
+			try
+			{
+				using var fileStream = File.OpenWrite(path);
+				using var streamWriter = new StreamWriter(fileStream);
+				var content = JsonConvert.SerializeObject(configuration);
+				await streamWriter.WriteAsync(content).ConfigureAwait(false);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				throw;
 			}
 		}
 
