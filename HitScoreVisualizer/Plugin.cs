@@ -48,6 +48,7 @@ namespace HitScoreVisualizer
 			SiraUtil.Zenject.Installer.UnregisterMenuInstaller<Installers.MenuInstaller>();
 
 			_harmonyInstance?.UnpatchAll(HARMONY_ID);
+			_harmonyInstance = null;
 		}
 	}
 }
