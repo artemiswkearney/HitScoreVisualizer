@@ -28,17 +28,9 @@ namespace HitScoreVisualizer.Services
 			text.enableWordWrapping = false;
 			text.overflowMode = TextOverflowModes.Overflow;
 
-			var judgment = Judgment.Default;
-			int index; // save in case we need to fade
-			for (index = 0; index < instance.Judgments!.Count; index++)
-			{
-				var j = instance.Judgments[index];
-				if (score >= j.Threshold)
-				{
-					judgment = j;
-					break;
-				}
-			}
+			// save in case we need to fade
+			var index = instance.Judgments!.FindIndex(j => j.Threshold <= score);
+			var judgment = index >= 0 ? instance.Judgments[index] : Judgment.Default;
 
 			Color color;
 			if (judgment.Fade)
