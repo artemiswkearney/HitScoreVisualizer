@@ -24,7 +24,7 @@ namespace HitScoreVisualizer.Services
 		internal Version MaximumMigrationNeededVersion { get; }
 
 		internal string? CurrentConfigPath => _hsvConfig.ConfigFilePath;
-		internal static Configuration? CurrentConfig { get; set; }
+		internal static Configuration? CurrentConfig { get; private set; }
 
 		public ConfigProvider(HSVConfig hsvConfig)
 		{
@@ -65,6 +65,7 @@ namespace HitScoreVisualizer.Services
 			var userConfig = await LoadConfig(_hsvConfig.ConfigFilePath).ConfigureAwait(false);
 			if (userConfig == null)
 			{
+				Plugin.LoggerInstance.Warn($"Couldn't load userConfig at {_hsvConfig.ConfigFilePath}");
 				return;
 			}
 
@@ -85,7 +86,7 @@ namespace HitScoreVisualizer.Services
 
 			foreach (var configInfo in configFileInfoList)
 			{
-				configInfo.Configuration = await LoadConfig(configInfo.ConfigPath);
+				configInfo.Configuration = await LoadConfig(configInfo.ConfigPath).ConfigureAwait(false);
 				configInfo.State = GetConfigState(configInfo.Configuration, configInfo.ConfigName);
 			}
 
