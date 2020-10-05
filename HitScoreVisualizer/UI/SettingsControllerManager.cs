@@ -39,7 +39,11 @@ namespace HitScoreVisualizer.UI
 				return;
 			}
 
-			MenuButtons.instance.UnregisterButton(_hsvButton);
+			if (MenuButtons.instance != null)
+			{
+				MenuButtons.instance.UnregisterButton(_hsvButton);
+			}
+
 			_hsvButton = null!;
 		}
 	}
