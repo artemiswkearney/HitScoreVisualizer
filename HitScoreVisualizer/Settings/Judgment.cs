@@ -6,7 +6,7 @@ namespace HitScoreVisualizer.Settings
 	internal class Judgment
 	{
 		[JsonIgnore]
-		internal static Judgment Default { get; } = new Judgment {Threshold = 0, Text = "", Color = new List<float> {1f, 1f, 1f, 1f}, Fade = false};
+		internal static Judgment Default { get; } = new Judgment {Threshold = 0, Text = string.Empty, Color = new List<float> {1f, 1f, 1f, 1f}, Fade = false};
 
 		// This judgment will be applied only to notes hit with score >= this number.
 		// Note that if no judgment can be applied to a note, the text will appear as in the unmodded

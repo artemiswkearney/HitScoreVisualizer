@@ -5,7 +5,7 @@ namespace HitScoreVisualizer.Settings
 	internal class JudgmentSegment
 	{
 		[JsonIgnore]
-		internal static JudgmentSegment Default { get; } = new JudgmentSegment {Threshold = 0, Text = ""};
+		internal static JudgmentSegment Default { get; } = new JudgmentSegment {Threshold = 0, Text = string.Empty};
 
 		// This judgment will be applied only when the appropriate part of the swing contributes score >= this number.
 		// If no judgment can be applied, the judgment for this segment will be "" (the empty string).
