@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
+using HitScoreVisualizer.Converters;
 using HitScoreVisualizer.Models;
 using HitScoreVisualizer.Services;
+using HitScoreVisualizer.Settings;
 using HMUI;
 using IPA.Utilities.Async;
 using Zenject;
@@ -18,6 +20,7 @@ namespace HitScoreVisualizer.UI
 	internal class ConfigSelectorViewController : BSMLAutomaticViewController
 	{
 		private ConfigProvider _configProvider = null!;
+		private HSVConfig _hsvConfig = null!;
 
 		private ConfigFileInfo? _selectedConfigFileInfo;
 
@@ -27,10 +30,22 @@ namespace HitScoreVisualizer.UI
 		}
 
 		[Inject]
-		internal void Construct(ConfigProvider configProvider)
+		internal void Construct(HSVConfig hsvConfig, ConfigProvider configProvider)
 		{
+			_hsvConfig = hsvConfig;
 			_configProvider = configProvider;
+
+			SetMigrationButtonColors();
 		}
+
+		[UIValue("migration-button-color-face")]
+		internal string QueueButtonColorFace { get; set; } = ButtonColorValueConverter.Convert();
+
+		[UIValue("migration-button-color-glow")]
+		internal string QueueButtonColorGlow { get; set; } = ButtonColorValueConverter.Convert();
+
+		[UIValue("migration-button-color-stroke")]
+		internal string QueueButtonColorStroke { get; set; } = ButtonColorValueConverter.Convert();
 
 		[UIComponent("configs-list")]
 		public CustomCellListTableData? customListTableData;
@@ -60,6 +75,13 @@ namespace HitScoreVisualizer.UI
 			NotifyPropertyChanged(nameof(CanConfigGetSelected));
 		}
 
+		[UIAction("toggle-migration")]
+		internal void ToggleMigration()
+		{
+			_hsvConfig.SaveOnMigration = !_hsvConfig.SaveOnMigration;
+			SetMigrationButtonColors();
+		}
+
 		[UIAction("reload-list")]
 		internal async void RefreshList()
 		{
@@ -67,13 +89,12 @@ namespace HitScoreVisualizer.UI
 		}
 
 		[UIAction("pick-config")]
-		internal void PickConfig()
+		internal async void PickConfig()
 		{
 			if (CanConfigGetSelected)
 			{
-				_configProvider.SelectUserConfig(_selectedConfigFileInfo);
-				NotifyPropertyChanged(nameof(HasConfigCurrently));
-				NotifyPropertyChanged(nameof(LoadedConfigText));
+				await _configProvider.SelectUserConfig(_selectedConfigFileInfo).ConfigureAwait(false);
+				await LoadInternal().ConfigureAwait(false);
 			}
 		}
 
@@ -153,6 +174,15 @@ namespace HitScoreVisualizer.UI
 				NotifyPropertyChanged(nameof(LoadingConfigs));
 				NotifyPropertyChanged(nameof(HasLoadedConfigs));
 			}).ConfigureAwait(false);
+		}
+
+		private void SetMigrationButtonColors()
+		{
+			QueueButtonColorFace = QueueButtonColorGlow = QueueButtonColorStroke = ButtonColorValueConverter.Convert(_hsvConfig.SaveOnMigration);
+
+			NotifyPropertyChanged(nameof(QueueButtonColorFace));
+			NotifyPropertyChanged(nameof(QueueButtonColorGlow));
+			NotifyPropertyChanged(nameof(QueueButtonColorStroke));
 		}
 	}
 }

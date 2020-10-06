@@ -74,7 +74,7 @@ namespace HitScoreVisualizer.Services
 				Configuration = userConfig, State = GetConfigState(userConfig, _hsvConfig.ConfigFilePath)
 			};
 
-			SelectUserConfig(configFileInfo);
+			await SelectUserConfig(configFileInfo).ConfigureAwait(false);
 		}
 
 		internal async Task<IEnumerable<ConfigFileInfo>> ListAvailableConfigs()
@@ -105,7 +105,7 @@ namespace HitScoreVisualizer.Services
 			}
 		}
 
-		internal void SelectUserConfig(ConfigFileInfo? configFileInfo)
+		internal async Task SelectUserConfig(ConfigFileInfo? configFileInfo)
 		{
 			// safe-guarding just to be sure
 			if (!ConfigSelectable(configFileInfo?.State))
@@ -115,7 +115,19 @@ namespace HitScoreVisualizer.Services
 
 			if (configFileInfo!.State == ConfigState.NeedsMigration)
 			{
-				RunMigration(configFileInfo.Configuration!);
+				if (configFileInfo.Configuration!.IsDefaultConfig)
+				{
+					configFileInfo.Configuration = Configuration.Default;
+				}
+				else
+				{
+					RunMigration(configFileInfo.Configuration!);
+				}
+
+				if (true)
+				{
+					await SaveConfig(configFileInfo.ConfigPath, configFileInfo.Configuration).ConfigureAwait(false);
+				}
 			}
 
 			CurrentConfig = configFileInfo.Configuration;

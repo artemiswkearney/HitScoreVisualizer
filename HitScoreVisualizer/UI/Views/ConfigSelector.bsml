@@ -30,10 +30,27 @@
 
 		<vertical vertical-fit='Unconstrained'
 				  preferred-height='50'
+				  preferred-width="28"
 				  child-align='MiddleCenter'
 				  child-expand-height='false'
 				  child-control-height='true'
 				  spacing="2">
+
+			<vertical child-align='UpperCenter'
+					  child-expand-height='true'
+					  child-control-height='false'>
+
+				<button pref-width='28'
+						word-wrapping='false'
+						child-align='UpperCenter'
+						face-color="~migration-button-color-face"
+						glow-color="~migration-button-color-glow"
+						stroke-color="~migration-button-color-stroke"
+						font-size="3.25"
+						text="Save on migration"
+						hover-hint="Whether or not to overwrite the original file after migration."
+						on-click="toggle-migration"/>
+			</vertical>
 
 			<button pref-width='28'
 					word-wrapping='false'
