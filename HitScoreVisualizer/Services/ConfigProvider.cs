@@ -171,9 +171,16 @@ namespace HitScoreVisualizer.Services
 		{
 			CreateHsvConfigsFolderIfYeetedByPlayer(false);
 
+			var fullPath = Path.Combine(_hsvConfigsFolderPath, relativePath);
+			var folderPath = Path.GetDirectoryName(fullPath);
+			if (folderPath != null && Directory.Exists(folderPath))
+			{
+				Directory.CreateDirectory(folderPath);
+			}
+
 			try
 			{
-				using var streamWriter = new StreamWriter(Path.Combine(_hsvConfigsFolderPath, relativePath), false);
+				using var streamWriter = new StreamWriter(fullPath, false);
 				var content = JsonConvert.SerializeObject(configuration, Formatting.Indented);
 				await streamWriter.WriteAsync(content).ConfigureAwait(false);
 			}
