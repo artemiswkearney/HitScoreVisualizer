@@ -141,6 +141,15 @@ namespace HitScoreVisualizer.Services
 			_hsvConfig.ConfigFilePath = null;
 		}
 
+		internal void YeetConfig(string relativePath)
+		{
+			var fullPath = Path.Combine(_hsvConfigsFolderPath, relativePath);
+			if (File.Exists(fullPath))
+			{
+				File.Delete(fullPath);
+			}
+		}
+
 		private async Task<Configuration?> LoadConfig(string relativePath)
 		{
 			CreateHsvConfigsFolderIfYeetedByPlayer(false);

@@ -73,6 +73,22 @@
 					glow-color="#BD2881"
 					interactable='~has-config-loaded'
 					on-click='unpick-config'/>
+
+			<vertical child-align='LowerCenter'
+					  child-expand-height='true'
+					  child-control-height='false'>
+
+				<button pref-width='28'
+						word-wrapping='false'
+						text="Yeet config"
+						stroke-color="#d1002d"
+						outline-color="#d1002d"
+						glow-color="#d1002d"
+						face-color="#d1002d"
+						interactable="~is-config-yeetable"
+						hover-hint="Yeet the config out of existence."
+						on-click="yeet-config"/>
+			</vertical>
 		</vertical>
 
 	</horizontal>

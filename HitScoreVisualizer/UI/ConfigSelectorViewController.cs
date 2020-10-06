@@ -68,11 +68,15 @@ namespace HitScoreVisualizer.UI
 		[UIValue("config-loaded-text")]
 		internal string LoadedConfigText => $"Currently loaded config: <size=80%>{(HasConfigCurrently ? Path.GetFileNameWithoutExtension(_configProvider.CurrentConfigPath) : "None")}";
 
+		[UIValue("is-config-yeetable")]
+		internal bool CanConfigGetYeeted => _selectedConfigFileInfo?.ConfigPath != null && _selectedConfigFileInfo.ConfigPath != _configProvider.CurrentConfigPath;
+
 		[UIAction("config-Selected")]
 		internal void Select(TableView tableView, object @object)
 		{
 			_selectedConfigFileInfo = (ConfigFileInfo)@object;
 			NotifyPropertyChanged(nameof(CanConfigGetSelected));
+			NotifyPropertyChanged(nameof(CanConfigGetYeeted));
 		}
 
 		[UIAction("toggle-migration")]
@@ -118,6 +122,20 @@ namespace HitScoreVisualizer.UI
 				NotifyPropertyChanged(nameof(HasConfigCurrently));
 				NotifyPropertyChanged(nameof(LoadedConfigText));
 			}
+		}
+
+		[UIAction("yeet-config")]
+		internal async void YeetConfig()
+		{
+			if (!CanConfigGetYeeted)
+			{
+				return;
+			}
+
+			_configProvider.YeetConfig(_selectedConfigFileInfo!.ConfigPath);
+			await LoadInternal().ConfigureAwait(false);
+
+			NotifyPropertyChanged(nameof(CanConfigGetYeeted));
 		}
 
 		protected override async void DidActivate(bool firstActivation, ActivationType type)
@@ -173,6 +191,8 @@ namespace HitScoreVisualizer.UI
 				LoadingConfigs = false;
 				NotifyPropertyChanged(nameof(LoadingConfigs));
 				NotifyPropertyChanged(nameof(HasLoadedConfigs));
+				NotifyPropertyChanged(nameof(HasConfigCurrently));
+				NotifyPropertyChanged(nameof(LoadedConfigText));
 			}).ConfigureAwait(false);
 		}
 
