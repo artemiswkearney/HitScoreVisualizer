@@ -56,7 +56,8 @@ namespace HitScoreVisualizer.Services
 				return;
 			}
 
-			if (!File.Exists(_hsvConfig.ConfigFilePath))
+			var fullPath = Path.Combine(_hsvConfigsFolderPath, _hsvConfig.ConfigFilePath);
+			if (!File.Exists(fullPath))
 			{
 				_hsvConfig.ConfigFilePath = null;
 				return;
@@ -65,13 +66,13 @@ namespace HitScoreVisualizer.Services
 			var userConfig = await LoadConfig(_hsvConfig.ConfigFilePath).ConfigureAwait(false);
 			if (userConfig == null)
 			{
-				Plugin.LoggerInstance.Warn($"Couldn't load userConfig at {_hsvConfig.ConfigFilePath}");
+				Plugin.LoggerInstance.Warn($"Couldn't load userConfig at {fullPath}");
 				return;
 			}
 
 			var configFileInfo = new ConfigFileInfo(Path.GetFileNameWithoutExtension(_hsvConfig.ConfigFilePath), _hsvConfig.ConfigFilePath)
 			{
-				Configuration = userConfig, State = GetConfigState(userConfig, _hsvConfig.ConfigFilePath)
+				Configuration = userConfig, State = GetConfigState(userConfig, Path.GetFileNameWithoutExtension(_hsvConfig.ConfigFilePath))
 			};
 
 			await SelectUserConfig(configFileInfo).ConfigureAwait(false);
@@ -81,12 +82,12 @@ namespace HitScoreVisualizer.Services
 		{
 			var configFileInfoList = Directory
 				.GetFiles(_hsvConfigsFolderPath)
-				.Select(x => new ConfigFileInfo(Path.GetFileNameWithoutExtension(x), x))
+				.Select(x => new ConfigFileInfo(Path.GetFileNameWithoutExtension(x), x.Substring(_hsvConfigsFolderPath.Length + 1)))
 				.ToList();
 
 			foreach (var configInfo in configFileInfoList)
 			{
-				configInfo.Configuration = await LoadConfig(configInfo.ConfigPath).ConfigureAwait(false);
+				configInfo.Configuration = await LoadConfig(Path.Combine(_hsvConfigsFolderPath, configInfo.ConfigPath)).ConfigureAwait(false);
 				configInfo.State = GetConfigState(configInfo.Configuration, configInfo.ConfigName);
 			}
 
@@ -140,14 +141,13 @@ namespace HitScoreVisualizer.Services
 			_hsvConfig.ConfigFilePath = null;
 		}
 
-		private async Task<Configuration?> LoadConfig(string path)
+		private async Task<Configuration?> LoadConfig(string relativePath)
 		{
 			CreateHsvConfigsFolderIfYeetedByPlayer(false);
 
 			try
 			{
-				using var fileStream = File.OpenRead(path);
-				using var streamReader = new StreamReader(fileStream);
+				using var streamReader = new StreamReader(Path.Combine(_hsvConfigsFolderPath, relativePath));
 				var content = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 				return JsonConvert.DeserializeObject<Configuration>(content, _jsonSerializerSettings);
 			}
@@ -158,15 +158,14 @@ namespace HitScoreVisualizer.Services
 			}
 		}
 
-		private async Task SaveConfig(string path, Configuration configuration)
+		private async Task SaveConfig(string relativePath, Configuration configuration)
 		{
 			CreateHsvConfigsFolderIfYeetedByPlayer(false);
 
 			try
 			{
-				using var fileStream = File.OpenWrite(path);
-				using var streamWriter = new StreamWriter(fileStream);
-				var content = JsonConvert.SerializeObject(configuration);
+				using var streamWriter = new StreamWriter(Path.Combine(_hsvConfigsFolderPath, relativePath), false);
+				var content = JsonConvert.SerializeObject(configuration, Formatting.Indented);
 				await streamWriter.WriteAsync(content).ConfigureAwait(false);
 			}
 			catch (Exception e)
