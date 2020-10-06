@@ -51,7 +51,7 @@ namespace HitScoreVisualizer.Settings
 			set
 			{
 				MajorVersion = value.Major;
-				MinorVersion = value.Major;
+				MinorVersion = value.Minor;
 				PatchVersion = value.Patch;
 			}
 		}
