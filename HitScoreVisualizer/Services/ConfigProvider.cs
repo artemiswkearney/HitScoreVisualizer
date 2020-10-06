@@ -81,7 +81,7 @@ namespace HitScoreVisualizer.Services
 		internal async Task<IEnumerable<ConfigFileInfo>> ListAvailableConfigs()
 		{
 			var configFileInfoList = Directory
-				.GetFiles(_hsvConfigsFolderPath)
+				.EnumerateFiles(_hsvConfigsFolderPath, "*", SearchOption.AllDirectories)
 				.Select(x => new ConfigFileInfo(Path.GetFileNameWithoutExtension(x), x.Substring(_hsvConfigsFolderPath.Length + 1)))
 				.ToList();
 
