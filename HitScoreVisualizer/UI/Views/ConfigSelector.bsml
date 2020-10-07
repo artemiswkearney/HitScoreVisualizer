@@ -67,10 +67,11 @@
 
 			<button pref-width='28'
 					word-wrapping='false'
-					text='Reset to none'
 					face-color="#BD2881"
 					stroke-color="#BD2881"
 					glow-color="#BD2881"
+					text='Reset to none'
+					hover-hint="Unselects the currently loaded config, basically reverting to the default game behavior."
 					interactable='~has-config-loaded'
 					on-click='unpick-config'/>
 
@@ -80,13 +81,13 @@
 
 				<button pref-width='28'
 						word-wrapping='false'
-						text="Yeet config"
 						stroke-color="#d1002d"
 						outline-color="#d1002d"
 						glow-color="#d1002d"
 						face-color="#d1002d"
-						interactable="~is-config-yeetable"
+						text="Yeet config"
 						hover-hint="Yeet the config out of existence."
+						interactable="~is-config-yeetable"
 						on-click="yeet-config"/>
 			</vertical>
 		</vertical>
