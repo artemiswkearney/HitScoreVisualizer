@@ -115,7 +115,7 @@ namespace HitScoreVisualizer.Settings
 		public List<JudgmentSegment>? BeforeCutAngleJudgments { get; set; }
 
 
-		// Judgments for the accuracy of the cut (how close to the center of the block the cut was, score is from 0-10).
+		// Judgments for the accuracy of the cut (how close to the center of the block the cut was, score is from 0-15).
 		// Format specifier: %C
 		[JsonProperty("accuracyJudgments")]
 		public List<JudgmentSegment>? AccuracyJudgments { get; set; }
