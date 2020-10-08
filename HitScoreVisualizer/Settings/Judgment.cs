@@ -23,7 +23,7 @@ namespace HitScoreVisualizer.Settings
 		[JsonProperty("color")]
 		public List<float> Color { get; set; } = new List<float>(4);
 
-		// If true, the text color will be lerped between this judgment's color and the previous
+		// If true, the text color will be interpolated between this judgment's color and the previous
 		// based on how close to the next threshold it is.
 		// Specifying fade : true for the first judgment in the array is an error, and will crash the
 		// plugin.
