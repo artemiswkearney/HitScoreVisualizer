@@ -10,9 +10,13 @@ namespace HitScoreVisualizer.Harmony_Patches
 // ReSharper disable InconsistentNaming
 		internal static bool Prefix(FlyingScoreEffect __instance, NoteCutInfo ____noteCutInfo)
 // ReSharper enable InconsistentNaming
-
 		{
-			if (ConfigProvider.CurrentConfig?.DoIntermediateUpdates ?? false)
+			if (ConfigProvider.CurrentConfig == null)
+			{
+				return true;
+			}
+
+			if (ConfigProvider.CurrentConfig.DoIntermediateUpdates)
 			{
 				ScoreModel.RawScoreWithoutMultiplier(____noteCutInfo, out var before, out var after, out var accuracy);
 				var total = before + after + accuracy;

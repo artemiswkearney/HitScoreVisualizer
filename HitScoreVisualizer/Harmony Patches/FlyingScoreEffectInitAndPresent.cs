@@ -45,6 +45,11 @@ namespace HitScoreVisualizer.Harmony_Patches
 		internal static void Postfix(FlyingScoreEffect __instance, NoteCutInfo noteCutInfo)
 // ReSharper restore InconsistentNaming
 		{
+			if (ConfigProvider.CurrentConfig == null)
+			{
+				return;
+			}
+
 			void Judge(SaberSwingRatingCounter counter)
 			{
 				ScoreModel.RawScoreWithoutMultiplier(noteCutInfo, out var before, out var after, out var accuracy);
