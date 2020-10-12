@@ -18,7 +18,7 @@ namespace HitScoreVisualizer.UI
 
 		public void Initialize()
 		{
-			_hsvButton = new MenuButton(Plugin.Name, "Select the config you want.", OnClick);
+			_hsvButton = new MenuButton($"<size=90%>{Plugin.Name}", "Select the config you want.", OnClick);
 			MenuButtons.instance.RegisterButton(_hsvButton);
 		}
 
