@@ -50,7 +50,7 @@ namespace HitScoreVisualizer.Harmony_Patches
 				return;
 			}
 
-			void Judge(SaberSwingRatingCounter counter)
+			void Judge(ISaberSwingRatingCounter counter)
 			{
 				ScoreModel.RawScoreWithoutMultiplier(noteCutInfo, out var before, out var after, out var accuracy);
 				var total = before + after + accuracy;

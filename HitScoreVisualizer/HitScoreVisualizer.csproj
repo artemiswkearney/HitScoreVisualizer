@@ -42,6 +42,10 @@
 			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\Main.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="GamePlayCore">
+			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\GamePlayCore.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 		<Reference Include="HMLib">
 			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\HMLib.dll</HintPath>
 			<Private>False</Private>
