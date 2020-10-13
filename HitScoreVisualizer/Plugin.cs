@@ -5,6 +5,7 @@ using HitScoreVisualizer.Installers;
 using IPA;
 using IPA.Loader;
 using IPA.Logging;
+using SiraUtil.Zenject;
 using Version = SemVer.Version;
 
 namespace HitScoreVisualizer
@@ -25,18 +26,18 @@ namespace HitScoreVisualizer
 		public static Version Version => _version ??= _metadata?.Version ?? Assembly.GetExecutingAssembly().GetName().Version.ToSemVerVersion();
 
 		[Init]
-		public void Init(Logger log, PluginMetadata pluginMetadata)
+		public void Init(Logger log, PluginMetadata pluginMetadata, Zenjector zenject)
 		{
 			LoggerInstance = log;
 			_metadata = pluginMetadata;
+
+			zenject.OnApp<AppInstaller>();
+			zenject.OnMenu<Installers.MenuInstaller>();
 		}
 
 		[OnEnable]
 		public void OnEnable()
 		{
-			SiraUtil.Zenject.Installer.RegisterAppInstaller<AppInstaller>();
-			SiraUtil.Zenject.Installer.RegisterMenuInstaller<Installers.MenuInstaller>();
-
 			_harmonyInstance = new Harmony(HARMONY_ID);
 			_harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
 		}
@@ -44,9 +45,6 @@ namespace HitScoreVisualizer
 		[OnDisable]
 		public void OnDisable()
 		{
-			SiraUtil.Zenject.Installer.UnregisterAppInstaller<AppInstaller>();
-			SiraUtil.Zenject.Installer.UnregisterMenuInstaller<Installers.MenuInstaller>();
-
 			_harmonyInstance?.UnpatchAll(HARMONY_ID);
 			_harmonyInstance = null;
 		}

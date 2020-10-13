@@ -5,7 +5,7 @@ using Zenject;
 
 namespace HitScoreVisualizer.Installers
 {
-	public class AppInstaller : MonoInstaller
+	public class AppInstaller : Installer<AppInstaller>
 	{
 		public override void InstallBindings()
 		{
