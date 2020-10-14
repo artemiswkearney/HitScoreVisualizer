@@ -14,11 +14,11 @@ namespace HitScoreVisualizer.UI
 		public SettingsControllerManager(HitScoreFlowCoordinator hitScoreFlowCoordinator)
 		{
 			_hitScoreFlowCoordinator = hitScoreFlowCoordinator;
+			_hsvButton = new MenuButton($"<size=89.5%>{Plugin.Name}", "Select the config you want.", OnClick);
 		}
 
 		public void Initialize()
 		{
-			_hsvButton = new MenuButton($"<size=90%>{Plugin.Name}", "Select the config you want.", OnClick);
 			MenuButtons.instance.RegisterButton(_hsvButton);
 		}
 
