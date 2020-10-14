@@ -138,16 +138,16 @@ namespace HitScoreVisualizer.UI
 			NotifyPropertyChanged(nameof(CanConfigGetYeeted));
 		}
 
-		protected override async void DidActivate(bool firstActivation, ActivationType type)
+		protected override async void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 		{
-			base.DidActivate(firstActivation, type);
+			base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
 
 			await LoadInternal().ConfigureAwait(false);
 		}
 
-		protected override void DidDeactivate(DeactivationType deactivationType)
+		protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
 		{
-			base.DidDeactivate(deactivationType);
+			base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
 
 			AvailableConfigs.Clear();
 

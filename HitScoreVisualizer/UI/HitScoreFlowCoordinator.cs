@@ -15,13 +15,13 @@ namespace HitScoreVisualizer.UI
 			_configSelectorViewController = configSelectorViewController;
 		}
 
-		protected override void DidActivate(bool firstActivation, ActivationType activationType)
+		protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 		{
 			try
 			{
 				if (firstActivation)
 				{
-					title = Plugin.Name;
+					SetTitle(Plugin.Name);
 					showBackButton = true;
 					ProvideInitialViewControllers(_configSelectorViewController);
 				}
