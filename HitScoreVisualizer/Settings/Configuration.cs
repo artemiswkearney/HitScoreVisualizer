@@ -13,7 +13,7 @@ namespace HitScoreVisualizer.Settings
 		{
 			Version = Plugin.Version,
 			IsDefaultConfig = true,
-			DisplayMode = string.Empty,
+			DisplayMode = "format",
 			UseFixedPos = false,
 			DoIntermediateUpdates = true,
 			Judgments = new List<Judgment>
