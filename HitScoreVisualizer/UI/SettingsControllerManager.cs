@@ -39,8 +39,11 @@ namespace HitScoreVisualizer.UI
 				return;
 			}
 
-			// ReSharper disable once Unity.NoNullPropagation
-			MenuButtons.instance?.UnregisterButton(_hsvButton);
+			if (MenuButtons.IsSingletonAvailable)
+			{
+				MenuButtons.instance.UnregisterButton(_hsvButton);
+			}
+
 
 			_hsvButton = null!;
 		}
