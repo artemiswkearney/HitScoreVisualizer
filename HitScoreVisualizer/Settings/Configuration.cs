@@ -6,7 +6,7 @@ using Version = SemVer.Version;
 
 namespace HitScoreVisualizer.Settings
 {
-	internal class Configuration
+	public class Configuration
 	{
 		[JsonIgnore]
 		internal static Configuration Default { get; } = new Configuration
@@ -61,7 +61,7 @@ namespace HitScoreVisualizer.Settings
 		// If this is true, the config will be overwritten with the plugin' default settings after an
 		// update rather than being converted.
 		[JsonProperty("isDefaultConfig")]
-		public bool IsDefaultConfig { get; set; }
+		public bool IsDefaultConfig { get; internal set; }
 
 		// If set to "format", displays the judgment text, with the following format specifiers allowed:
 		// - %b: The score contributed by the part of the swing before cutting the block.
@@ -80,25 +80,25 @@ namespace HitScoreVisualizer.Settings
 		// Otherwise, displays both (judgment text above numeric score).
 		[JsonProperty("displayMode")]
 		[DefaultValue("")]
-		public string DisplayMode { get; set; } = string.Empty;
+		public string DisplayMode { get; internal set; } = string.Empty;
 
 		// If enabled, judgments will appear and stay at (fixedPosX, fixedPosY, fixedPosZ) rather than moving as normal.
 		// Additionally, the previous judgment will disappear when a new one is created (so there won't be overlap).
 		[JsonProperty("useFixedPos")]
 		[DefaultValue(false)]
-		public bool UseFixedPos { get; set; }
+		public bool UseFixedPos { get; internal set; }
 
 		[JsonProperty("fixedPosX")]
 		[DefaultValue(0f)]
-		public float FixedPosX { get; set; }
+		public float FixedPosX { get; internal set; }
 
 		[JsonProperty("fixedPosY")]
 		[DefaultValue(0f)]
-		public float FixedPosY { get; set; }
+		public float FixedPosY { get; internal set; }
 
 		[JsonProperty("fixedPosZ")]
 		[DefaultValue(0f)]
-		public float FixedPosZ { get; set; }
+		public float FixedPosZ { get; internal set; }
 
 		// Only call this when this was validated beforehand
 		[JsonIgnore]
@@ -106,41 +106,41 @@ namespace HitScoreVisualizer.Settings
 
 		// If enabled, judgments will be updated more frequently. This will make score popups more accurate during a brief period before the note's score is finalized, at some cost of performance.
 		[JsonProperty("doIntermediateUpdates")]
-		public bool DoIntermediateUpdates { get; set; }
+		public bool DoIntermediateUpdates { get; internal set; }
 
 		// Number of decimal places to show time dependence to
 		[JsonProperty("timeDependencyDecimalPrecision")]
 		[DefaultValue(1)]
-		public int TimeDependenceDecimalPrecision { get; set; }
+		public int TimeDependenceDecimalPrecision { get; internal set; }
 
 		// Which power of 10 to multiply the time dependence by
 		[JsonProperty("timeDependencyDecimalOffset")]
 		[DefaultValue(2)]
-		public int TimeDependenceDecimalOffset { get; set; }
+		public int TimeDependenceDecimalOffset { get; internal set; }
 
 		// Order from highest threshold to lowest; the first matching judgment will be applied
 		[JsonProperty("judgments")]
-		public List<Judgment>? Judgments { get; set; }
+		public List<Judgment>? Judgments { get; internal set; }
 
 		// Judgments for the part of the swing before cutting the block (score is from 0-70).
 		// Format specifier: %B
 		[JsonProperty("beforeCutAngleJudgments")]
-		public List<JudgmentSegment>? BeforeCutAngleJudgments { get; set; }
+		public List<JudgmentSegment>? BeforeCutAngleJudgments { get; internal set; }
 
 
 		// Judgments for the accuracy of the cut (how close to the center of the block the cut was, score is from 0-15).
 		// Format specifier: %C
 		[JsonProperty("accuracyJudgments")]
-		public List<JudgmentSegment>? AccuracyJudgments { get; set; }
+		public List<JudgmentSegment>? AccuracyJudgments { get; internal set; }
 
 		// Judgments for the part of the swing after cutting the block (score is from 0-30).
 		// Format specifier: %A
 		[JsonProperty("afterCutAngleJudgments")]
-		public List<JudgmentSegment>? AfterCutAngleJudgments { get; set; }
+		public List<JudgmentSegment>? AfterCutAngleJudgments { get; internal set; }
 
 		// Judgments for time dependence (score is from 0-1).
 		// Format specifier: %T
 		[JsonProperty("timeDependencyJudgments")]
-		public List<TimeDependenceJudgmentSegment>? TimeDependenceJudgments { get; set; }
+		public List<TimeDependenceJudgmentSegment>? TimeDependenceJudgments { get; internal set; }
 	}
 }

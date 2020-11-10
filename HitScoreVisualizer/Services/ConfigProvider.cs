@@ -12,9 +12,9 @@ using Version = SemVer.Version;
 
 namespace HitScoreVisualizer.Services
 {
-	internal class ConfigProvider : IInitializable
+	public class ConfigProvider : IInitializable
 	{
-		private readonly HSVConfig _hsvConfig;
+		private HSVConfig _hsvConfig = null!;
 
 		private readonly string _hsvConfigsFolderPath;
 		private readonly JsonSerializerSettings _jsonSerializerSettings;
@@ -27,10 +27,8 @@ namespace HitScoreVisualizer.Services
 		internal string? CurrentConfigPath => _hsvConfig.ConfigFilePath;
 		internal static Configuration? CurrentConfig { get; private set; }
 
-		public ConfigProvider(HSVConfig hsvConfig)
+		public ConfigProvider()
 		{
-			_hsvConfig = hsvConfig;
-
 			_jsonSerializerSettings = new JsonSerializerSettings {DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Formatting = Formatting.Indented};
 			_hsvConfigsFolderPath = Path.Combine(UnityGame.UserDataPath, nameof(HitScoreVisualizer));
 
@@ -43,6 +41,12 @@ namespace HitScoreVisualizer.Services
 
 			MinimumMigratableVersion = _migrationActions.Keys.Min();
 			MaximumMigrationNeededVersion = _migrationActions.Keys.Max();
+		}
+
+		[Inject]
+		internal void Construct(HSVConfig hsvConfig)
+		{
+			_hsvConfig = hsvConfig;
 		}
 
 		public async void Initialize()
@@ -93,6 +97,11 @@ namespace HitScoreVisualizer.Services
 			};
 
 			await SelectUserConfig(configFileInfo).ConfigureAwait(false);
+		}
+
+		public Configuration? GetCurrentConfig()
+		{
+			return CurrentConfig;
 		}
 
 		internal async Task<IEnumerable<ConfigFileInfo>> ListAvailableConfigs()
@@ -178,8 +187,9 @@ namespace HitScoreVisualizer.Services
 				var content = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 				return JsonConvert.DeserializeObject<Configuration>(content, _jsonSerializerSettings);
 			}
-			catch
+			catch (Exception ex)
 			{
+				Plugin.LoggerInstance.Warn(ex);
 				// Expected behaviour when file isn't an actual hsv config file...
 				return null!;
 			}
