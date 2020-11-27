@@ -6,11 +6,9 @@
 		<LangVersion>9</LangVersion>
 		<Nullable>enable</Nullable>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<OutDir>$(ProjectDir)bin\$(Configuration)</OutDir>
-		<ModVersion>3.0.2</ModVersion>
-		<AssemblyVersion>$(ModVersion)</AssemblyVersion>
-		<FileVersion>$(ModVersion)</FileVersion>
-		<InformationalVersion>$(ModVersion)</InformationalVersion>
+		<LocalRefsDir Condition="Exists('..\Refs')">..\Refs</LocalRefsDir>
+		<BeatSaberDir>$(LocalRefsDir)</BeatSaberDir>
+		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -21,71 +19,82 @@
 		<DebugType>pdbonly</DebugType>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="$(DefineConstants.Contains('CIBuild')) OR '$(NCrunch)' == '1'">
+		<DisableCopyToPlugins>True</DisableCopyToPlugins>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(NCrunch)' == '1'">
+		<DisableCopyToPlugins>True</DisableCopyToPlugins>
+		<DisableZipRelease>True</DisableZipRelease>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<Reference Include="UnityEngine">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\UnityEngine.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Unity.TextMeshPro">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.TextMeshPro.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="IPA.Loader">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Main">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\Main.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="GamePlayCore">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\GamePlayCore.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GamePlayCore.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="HMLib">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\HMLib.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMLib.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="HMUI">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\HMUI.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMUI.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="0Harmony">
-			<HintPath>$(GameDirPath)Libs\0Harmony.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
-			<HintPath>$(GameDirPath)Libs\Newtonsoft.Json.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="SemVer">
-			<HintPath>$(GameDirPath)Libs\SemVer.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Libs\SemVer.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="BSML">
-			<HintPath>$(GameDirPath)Plugins\BSML.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Zenject">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\Zenject.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="Zenject-usage">
-			<HintPath>$(GameDirPath)Beat Saber_Data\Managed\Zenject-usage.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject-usage.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="SiraUtil">
-			<HintPath>$(GameDirPath)Plugins\SiraUtil.dll</HintPath>
+			<HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="HitScoreVisualizer.csproj.user"/>
+		<None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
+		<None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
+		<None Include="HitScoreVisualizer.csproj.user" Condition="Exists('HitScoreVisualizer.csproj.user')" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -93,11 +102,10 @@
 		<EmbeddedResource Include="UI\Views\*.bsml"/>
 	</ItemGroup>
 
-	<Target Name="CopyToPlugins" AfterTargets="AfterBuild">
-		<Message Text="Copying $(OutDir)HitScoreVisualizer.dll to Plugins folder" Importance="high"/>
-		<Copy SourceFiles="$(OutDir)HitScoreVisualizer.dll" DestinationFiles="$(GameDirPath)Plugins\HitScoreVisualizer.dll"/>
-		<Message Text="Copying $(OutDir)HitScoreVisualizer.pdb to Plugins folder" Importance="high"/>
-		<Copy SourceFiles="$(OutDir)HitScoreVisualizer.pdb" DestinationFiles="$(GameDirPath)Plugins\HitScoreVisualizer.pdb"/>
-	</Target>
-
+	<ItemGroup>
+		<PackageReference Include="BeatSaberModdingTools.Tasks" Version="1.3.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 </Project>
