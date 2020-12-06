@@ -83,10 +83,41 @@
 						text="Yeet config"
 						hover-hint="Yeets the config out of existence."
 						interactable="~is-config-yeetable"
-						on-click="yeet-config"/>
+						event-click="show-yeet-modal"/>
 			</vertical>
 		</vertical>
 
+		<modal size-delta-x="50"
+			   size-delta-y="40"
+			   clickerino-offerino-closerino="false"
+			   move-to-center="true"
+			   show-event="show-yeet-modal"
+			   hide-event="hide-yeet-modal">
+			<vertical
+				preferred-width="50"
+				preferred-height="40"
+				pad="2"
+				child-align="MiddleCenter"
+				child-control-height="true"
+				child-expand-height="true">
+				<text text="Are you really sure that you want to delete the selected config? This can not be undone."
+					  align="Center"
+					  word-wrapping="true"
+					  bold="true"
+					  italics="true"/>
+				<horizontal vertical-fit="MinSize">
+					<button word-wrapping='false'
+							text="No"
+							event-click="hide-yeet-modal"/>
+					<button word-wrapping='false'
+							outline-color="#d1002d"
+							face-color="#d1002d"
+							text="Yes"
+							event-click="hide-yeet-modal"
+							on-click="yeet-config"/>
+				</horizontal>
+			</vertical>
+		</modal>
 	</horizontal>
 
 	<stack pad-left="4"
