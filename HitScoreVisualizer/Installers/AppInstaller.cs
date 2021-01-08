@@ -1,26 +1,31 @@
 ﻿using HitScoreVisualizer.Services;
 using HitScoreVisualizer.Settings;
 using IPA.Config.Stores;
+using IPA.Logging;
+using SiraUtil;
 using Zenject;
 
 namespace HitScoreVisualizer.Installers
 {
-	public class AppInstaller : Installer<AppInstaller>
+	internal class AppInstaller : Installer<Logger, AppInstaller>
 	{
+		private readonly Logger _logger;
+
+		internal AppInstaller(Logger logger)
+		{
+			_logger = logger;
+		}
+
 		public override void InstallBindings()
 		{
-			Plugin.LoggerInstance.Debug($"Running {nameof(InstallBindings)} of {nameof(AppInstaller)}");
+			Container.BindLoggerAsSiraLogger(_logger);
 
-			Plugin.LoggerInstance.Debug($"Binding {nameof(HSVConfig)}");
 			HSVConfig.Instance ??= IPA.Config.Config
 				.GetConfigFor(Plugin.Name)
 				.Generated<HSVConfig>();
 			Container.BindInstance(HSVConfig.Instance);
 
-			Plugin.LoggerInstance.Debug($"Binding {nameof(ConfigProvider)}");
 			Container.BindInterfacesAndSelfTo<ConfigProvider>().AsSingle().NonLazy();
-
-			Plugin.LoggerInstance.Debug($"All bindings installed in {nameof(AppInstaller)}");
 		}
 	}
 }

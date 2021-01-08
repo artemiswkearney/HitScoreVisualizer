@@ -8,15 +8,11 @@ namespace HitScoreVisualizer.Installers
 	{
 		public override void InstallBindings()
 		{
-			Plugin.LoggerInstance.Debug($"Running {nameof(InstallBindings)} of {nameof(MenuInstaller)}");
-
-			Container.BindViewController<ConfigSelectorViewController>();
+			Container.Bind<ConfigSelectorViewController>().FromNewComponentAsViewController().AsSingle();
 			Container.BindFlowCoordinator<HitScoreFlowCoordinator>();
 
-			Plugin.LoggerInstance.Debug($"Binding {nameof(SettingsControllerManager)}");
 			Container.BindInterfacesAndSelfTo<SettingsControllerManager>().AsSingle().NonLazy();
 
-			Plugin.LoggerInstance.Debug($"All bindings installed in {nameof(MenuInstaller)}");
 		}
 	}
 }

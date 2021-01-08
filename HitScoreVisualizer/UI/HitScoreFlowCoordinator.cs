@@ -1,17 +1,20 @@
 ﻿using System;
 using BeatSaberMarkupLanguage;
 using HMUI;
+using SiraUtil.Tools;
 using Zenject;
 
 namespace HitScoreVisualizer.UI
 {
 	internal class HitScoreFlowCoordinator : FlowCoordinator
 	{
+		private SiraLog _siraLog = null!;
 		private ConfigSelectorViewController? _configSelectorViewController;
 
 		[Inject]
-		internal void Construct(ConfigSelectorViewController configSelectorViewController)
+		internal void Construct(SiraLog siraLog, ConfigSelectorViewController configSelectorViewController)
 		{
+			_siraLog = siraLog;
 			_configSelectorViewController = configSelectorViewController;
 		}
 
@@ -28,7 +31,7 @@ namespace HitScoreVisualizer.UI
 			}
 			catch (Exception ex)
 			{
-				Plugin.LoggerInstance.Error(ex);
+				_siraLog.Error(ex);
 			}
 		}
 

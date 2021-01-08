@@ -59,6 +59,7 @@ namespace HitScoreVisualizer.Services
 			};
 		}
 
+		// ReSharper disable once CognitiveComplexity
 		private static string DisplayModeFormat(int score, int before, int after, int accuracy, float timeDependence, Judgment judgment, Configuration instance)
 		{
 			var formattedBuilder = new StringBuilder();

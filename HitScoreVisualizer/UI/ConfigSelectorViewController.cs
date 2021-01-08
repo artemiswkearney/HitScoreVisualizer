@@ -11,6 +11,7 @@ using HitScoreVisualizer.Services;
 using HitScoreVisualizer.Settings;
 using HMUI;
 using IPA.Utilities.Async;
+using SiraUtil.Tools;
 using Zenject;
 
 namespace HitScoreVisualizer.UI
@@ -19,6 +20,7 @@ namespace HitScoreVisualizer.UI
 	[ViewDefinition("HitScoreVisualizer.UI.Views.ConfigSelector.bsml")]
 	internal class ConfigSelectorViewController : BSMLAutomaticViewController
 	{
+		private SiraLog _siraLog = null!;
 		private ConfigProvider _configProvider = null!;
 		private HSVConfig _hsvConfig = null!;
 
@@ -30,8 +32,9 @@ namespace HitScoreVisualizer.UI
 		}
 
 		[Inject]
-		internal void Construct(HSVConfig hsvConfig, ConfigProvider configProvider)
+		internal void Construct(SiraLog siraLog, HSVConfig hsvConfig, ConfigProvider configProvider)
 		{
+			_siraLog = siraLog;
 			_hsvConfig = hsvConfig;
 			_configProvider = configProvider;
 
@@ -72,7 +75,7 @@ namespace HitScoreVisualizer.UI
 		internal bool CanConfigGetYeeted => _selectedConfigFileInfo?.ConfigPath != null && _selectedConfigFileInfo.ConfigPath != _configProvider.CurrentConfigPath;
 
 		[UIAction("config-Selected")]
-		internal void Select(TableView tableView, object @object)
+		internal void Select(TableView _, object @object)
 		{
 			_selectedConfigFileInfo = (ConfigFileInfo)@object;
 			NotifyPropertyChanged(nameof(CanConfigGetSelected));
@@ -111,7 +114,7 @@ namespace HitScoreVisualizer.UI
 				{
 					if (customListTableData == null)
 					{
-						Plugin.LoggerInstance.Warn($"{nameof(customListTableData)} is null.");
+						_siraLog.Warning($"{nameof(customListTableData)} is null.");
 						return;
 					}
 
@@ -158,7 +161,7 @@ namespace HitScoreVisualizer.UI
 		{
 			if (customListTableData == null)
 			{
-				Plugin.LoggerInstance.Warn($"{nameof(customListTableData)} is null.");
+				_siraLog.Warning($"{nameof(customListTableData)} is null.");
 				return;
 			}
 

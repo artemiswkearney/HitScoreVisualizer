@@ -7,6 +7,7 @@ using HitScoreVisualizer.Models;
 using HitScoreVisualizer.Settings;
 using IPA.Utilities;
 using Newtonsoft.Json;
+using SiraUtil.Tools;
 using Zenject;
 using Version = SemVer.Version;
 
@@ -14,6 +15,7 @@ namespace HitScoreVisualizer.Services
 {
 	public class ConfigProvider : IInitializable
 	{
+		private SiraLog _siraLog = null!;
 		private HSVConfig _hsvConfig = null!;
 
 		private readonly string _hsvConfigsFolderPath;
@@ -44,8 +46,9 @@ namespace HitScoreVisualizer.Services
 		}
 
 		[Inject]
-		internal void Construct(HSVConfig hsvConfig)
+		internal void Construct(SiraLog siraLog, HSVConfig hsvConfig)
 		{
+			_siraLog = siraLog;
 			_hsvConfig = hsvConfig;
 		}
 
@@ -67,7 +70,7 @@ namespace HitScoreVisualizer.Services
 					}
 					catch (Exception e)
 					{
-						Plugin.LoggerInstance.Warn(e);
+						_siraLog.Warning(e);
 					}
 				}
 			}
@@ -87,7 +90,7 @@ namespace HitScoreVisualizer.Services
 			var userConfig = await LoadConfig(_hsvConfig.ConfigFilePath).ConfigureAwait(false);
 			if (userConfig == null)
 			{
-				Plugin.LoggerInstance.Warn($"Couldn't load userConfig at {fullPath}");
+				_siraLog.Warning($"Couldn't load userConfig at {fullPath}");
 				return;
 			}
 
@@ -189,7 +192,7 @@ namespace HitScoreVisualizer.Services
 			}
 			catch (Exception ex)
 			{
-				Plugin.LoggerInstance.Warn(ex);
+				_siraLog.Warning(ex);
 				// Expected behaviour when file isn't an actual hsv config file...
 				return null!;
 			}
@@ -244,11 +247,12 @@ namespace HitScoreVisualizer.Services
 			return configuration.Version <= MaximumMigrationNeededVersion ? ConfigState.NeedsMigration : ConfigState.Compatible;
 		}
 
-		private static bool Validate(Configuration configuration, string configName)
+		// ReSharper disable once CognitiveComplexity
+		private bool Validate(Configuration configuration, string configName)
 		{
 			if (!configuration.Judgments?.Any() ?? true)
 			{
-				Plugin.LoggerInstance.Warn($"No judgments found for {configName}");
+				_siraLog.Warning($"No judgments found for {configName}");
 				return false;
 			}
 
@@ -260,13 +264,13 @@ namespace HitScoreVisualizer.Services
 			// 99 is the max for NumberFormatInfo.NumberDecimalDigits
 			if (configuration.TimeDependenceDecimalPrecision < 0 || configuration.TimeDependenceDecimalPrecision > 99)
 			{
-				Plugin.LoggerInstance.Warn($"timeDependencyDecimalPrecision value {configuration.TimeDependenceDecimalPrecision} is outside the range of acceptable values [0, 99]");
+				_siraLog.Warning($"timeDependencyDecimalPrecision value {configuration.TimeDependenceDecimalPrecision} is outside the range of acceptable values [0, 99]");
 				return false;
 			}
 
 			if (configuration.TimeDependenceDecimalOffset < 0 || configuration.TimeDependenceDecimalOffset > Math.Log10(float.MaxValue))
 			{
-				Plugin.LoggerInstance.Warn($"timeDependencyDecimalOffset value {configuration.TimeDependenceDecimalOffset} is outside the range of acceptable values [0, {(int) Math.Log10(float.MaxValue)}]");
+				_siraLog.Warning($"timeDependencyDecimalOffset value {configuration.TimeDependenceDecimalOffset} is outside the range of acceptable values [0, {(int) Math.Log10(float.MaxValue)}]");
 				return false;
 			}
 
@@ -309,7 +313,8 @@ namespace HitScoreVisualizer.Services
 			return true;
 		}
 
-		private static bool ValidateJudgments(Configuration configuration, string configName)
+		// ReSharper disable once CognitiveComplexity
+		private bool ValidateJudgments(Configuration configuration, string configName)
 		{
 			configuration.Judgments = configuration.Judgments!.OrderByDescending(x => x.Threshold).ToList();
 			var prevJudgement = configuration.Judgments.First();
@@ -320,7 +325,7 @@ namespace HitScoreVisualizer.Services
 
 			if (!ValidateJudgmentColor(prevJudgement, configName))
 			{
-				Plugin.LoggerInstance.Warn($"Judgment entry for threshold {prevJudgement.Threshold} has invalid color in {configName}");
+				_siraLog.Warning($"Judgment entry for threshold {prevJudgement.Threshold} has invalid color in {configName}");
 				return false;
 			}
 
@@ -333,7 +338,7 @@ namespace HitScoreVisualizer.Services
 					{
 						if (!ValidateJudgmentColor(currentJudgement, configName))
 						{
-							Plugin.LoggerInstance.Warn($"Judgment entry for threshold {currentJudgement.Threshold} has invalid color in {configName}");
+							_siraLog.Warning($"Judgment entry for threshold {currentJudgement.Threshold} has invalid color in {configName}");
 							return false;
 						}
 
@@ -341,7 +346,7 @@ namespace HitScoreVisualizer.Services
 						continue;
 					}
 
-					Plugin.LoggerInstance.Warn($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
+					_siraLog.Warning($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
 					return false;
 				}
 			}
@@ -349,11 +354,11 @@ namespace HitScoreVisualizer.Services
 			return true;
 		}
 
-		private static bool ValidateJudgmentColor(Judgment judgment, string configName)
+		private bool ValidateJudgmentColor(Judgment judgment, string configName)
 		{
 			if (judgment.Color.Count != 4)
 			{
-				Plugin.LoggerInstance.Warn($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers for each judgment's color!");
+				_siraLog.Warning($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers for each judgment's color!");
 				return false;
 			}
 
@@ -362,12 +367,11 @@ namespace HitScoreVisualizer.Services
 				return true;
 			}
 
-			Plugin.LoggerInstance
-				.Warn($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers that are greater or equal than 0 (and preferably smaller or equal than 1) for each judgment's color!");
+			_siraLog.Warning($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers that are greater or equal than 0 (and preferably smaller or equal than 1) for each judgment's color!");
 			return false;
 		}
 
-		private static bool ValidateJudgmentSegment(List<JudgmentSegment> segments, string configName)
+		private bool ValidateJudgmentSegment(List<JudgmentSegment> segments, string configName)
 		{
 			if (segments.Count <= 1)
 			{
@@ -384,14 +388,14 @@ namespace HitScoreVisualizer.Services
 					continue;
 				}
 
-				Plugin.LoggerInstance.Warn($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
+				_siraLog.Warning($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
 				return false;
 			}
 
 			return true;
 		}
 
-		private static bool ValidateTimeDependenceJudgmentSegment(List<TimeDependenceJudgmentSegment> segments, string configName)
+		private bool ValidateTimeDependenceJudgmentSegment(List<TimeDependenceJudgmentSegment> segments, string configName)
 		{
 			if (segments.Count <= 1)
 			{
@@ -408,7 +412,7 @@ namespace HitScoreVisualizer.Services
 					continue;
 				}
 
-				Plugin.LoggerInstance.Warn($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
+				_siraLog.Warning($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
 				return false;
 			}
 
@@ -469,7 +473,7 @@ namespace HitScoreVisualizer.Services
 			{
 				if (!calledOnInit)
 				{
-					Plugin.LoggerInstance.Warn("*sigh* Don't yeet the HSV configs folder while the game is running... Recreating it again...");
+					_siraLog.Warning("*sigh* Don't yeet the HSV configs folder while the game is running... Recreating it again...");
 				}
 
 				Directory.CreateDirectory(_hsvConfigsFolderPath);

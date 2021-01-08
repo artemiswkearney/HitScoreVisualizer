@@ -20,18 +20,15 @@ namespace HitScoreVisualizer
 		private static string? _name;
 		private static Version? _version;
 
-		internal static Logger LoggerInstance { get; private set; } = null!;
-
 		public static string Name => _name ??= _metadata?.Name ?? Assembly.GetExecutingAssembly().GetName().Name;
 		public static Version Version => _version ??= _metadata?.Version ?? Assembly.GetExecutingAssembly().GetName().Version.ToSemVerVersion();
 
 		[Init]
-		public void Init(Logger log, PluginMetadata pluginMetadata, Zenjector zenject)
+		public void Init(Logger logger, PluginMetadata pluginMetadata, Zenjector zenject)
 		{
-			LoggerInstance = log;
 			_metadata = pluginMetadata;
 
-			zenject.OnApp<AppInstaller>();
+			zenject.OnApp<AppInstaller>().WithParameters(logger);
 			zenject.OnMenu<Installers.MenuInstaller>();
 		}
 
