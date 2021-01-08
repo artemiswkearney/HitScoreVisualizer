@@ -9,7 +9,7 @@ This mod requires a few other mods in order to work.
 
 - BeatSaberMarkupLanguage v1.4.2 or higher
 - BSIPA v4.1.3 or higher
-- SiraUtil v2.2.0 or higher
+- SiraUtil v2.3.1 or higher
 
 The installation is fairly simple.
 
