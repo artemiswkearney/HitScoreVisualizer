@@ -2,7 +2,10 @@
 using System.Reflection;
 using HitScoreVisualizer.Extensions;
 using HitScoreVisualizer.Installers;
+using HitScoreVisualizer.Settings;
 using IPA;
+using IPA.Config;
+using IPA.Config.Stores;
 using IPA.Loader;
 using IPA.Logging;
 using SiraUtil.Zenject;
@@ -24,11 +27,11 @@ namespace HitScoreVisualizer
 		public static Version Version => _version ??= _metadata?.Version ?? Assembly.GetExecutingAssembly().GetName().Version.ToSemVerVersion();
 
 		[Init]
-		public void Init(Logger logger, PluginMetadata pluginMetadata, Zenjector zenject)
+		public void Init(Logger logger, Config config, PluginMetadata pluginMetadata, Zenjector zenject)
 		{
 			_metadata = pluginMetadata;
 
-			zenject.OnApp<AppInstaller>().WithParameters(logger);
+			zenject.OnApp<AppInstaller>().WithParameters(logger, config.Generated<HSVConfig>());
 			zenject.OnMenu<Installers.MenuInstaller>();
 		}
 

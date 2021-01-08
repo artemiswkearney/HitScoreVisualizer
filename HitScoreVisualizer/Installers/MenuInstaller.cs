@@ -4,7 +4,7 @@ using Zenject;
 
 namespace HitScoreVisualizer.Installers
 {
-	public class MenuInstaller : Installer<MenuInstaller>
+	internal class MenuInstaller : Installer<MenuInstaller>
 	{
 		public override void InstallBindings()
 		{
