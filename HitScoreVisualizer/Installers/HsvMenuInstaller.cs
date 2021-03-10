@@ -4,15 +4,13 @@ using Zenject;
 
 namespace HitScoreVisualizer.Installers
 {
-	internal class MenuInstaller : Installer<MenuInstaller>
+	internal class HsvMenuInstaller : Installer<HsvMenuInstaller>
 	{
 		public override void InstallBindings()
 		{
 			Container.Bind<ConfigSelectorViewController>().FromNewComponentAsViewController().AsSingle();
-			Container.BindFlowCoordinator<HitScoreFlowCoordinator>();
-
-			Container.BindInterfacesAndSelfTo<SettingsControllerManager>().AsSingle().NonLazy();
-
+			Container.Bind<HitScoreFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
+			Container.BindInterfacesTo<SettingsControllerManager>().AsSingle();
 		}
 	}
 }

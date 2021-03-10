@@ -31,8 +31,8 @@ namespace HitScoreVisualizer
 		{
 			_metadata = pluginMetadata;
 
-			zenject.OnApp<AppInstaller>().WithParameters(logger, config.Generated<HSVConfig>());
-			zenject.OnMenu<Installers.MenuInstaller>();
+			zenject.OnApp<HsvAppInstaller>().WithParameters(logger, config.Generated<HSVConfig>());
+			zenject.OnMenu<HsvMenuInstaller>();
 		}
 
 		[OnEnable]
