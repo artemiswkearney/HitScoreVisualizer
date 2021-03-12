@@ -23,8 +23,8 @@ namespace HitScoreVisualizer.Services
 
 		private readonly Dictionary<Version, Func<Configuration, bool>> _migrationActions;
 
-		internal Version MinimumMigratableVersion { get; }
-		internal Version MaximumMigrationNeededVersion { get; }
+		private readonly Version _minimumMigratableVersion;
+		private readonly Version _maximumMigrationNeededVersion;
 
 		private Configuration? _currentConfig;
 
@@ -42,8 +42,8 @@ namespace HitScoreVisualizer.Services
 				{new Version(2, 2, 3), RunMigration2_2_3}
 			};
 
-			MinimumMigratableVersion = _migrationActions.Keys.Min();
-			MaximumMigrationNeededVersion = _migrationActions.Keys.Max();
+			_minimumMigratableVersion = _migrationActions.Keys.Min();
+			_maximumMigrationNeededVersion = _migrationActions.Keys.Max();
 		}
 
 		[Inject]
@@ -235,7 +235,7 @@ namespace HitScoreVisualizer.Services
 				return ConfigState.NewerVersion;
 			}
 
-			if (configuration.Version < MinimumMigratableVersion)
+			if (configuration.Version < _minimumMigratableVersion)
 			{
 				return ConfigState.Incompatible;
 			}
@@ -245,7 +245,7 @@ namespace HitScoreVisualizer.Services
 				return ConfigState.ValidationFailed;
 			}
 
-			return configuration.Version <= MaximumMigrationNeededVersion ? ConfigState.NeedsMigration : ConfigState.Compatible;
+			return configuration.Version <= _maximumMigrationNeededVersion ? ConfigState.NeedsMigration : ConfigState.Compatible;
 		}
 
 		// ReSharper disable once CognitiveComplexity
