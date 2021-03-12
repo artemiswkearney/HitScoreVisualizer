@@ -1,4 +1,4 @@
-using HarmonyLib;
+/*using HarmonyLib;
 using HitScoreVisualizer.Services;
 using IPA.Utilities;
 using UnityEngine;
@@ -6,8 +6,8 @@ using UnityEngine;
 namespace HitScoreVisualizer.Harmony_Patches
 {
 	[HarmonyPatch(typeof(FlyingScoreEffect))]
-	[HarmonyPatch("InitAndPresent", MethodType.Normal)]
-	internal class FlyingScoreEffectInitAndPresent
+	[HarmonyPatch(nameof(FlyingScoreEffect.InitAndPresent), MethodType.Normal)]
+	internal class FlyingScoreEffectInitAndPresent : ISaberSwingRatingCounterDidFinishReceiver
 	{
 		private static FlyingScoreEffect _currentEffect = null!;
 
@@ -75,4 +75,4 @@ namespace HitScoreVisualizer.Harmony_Patches
 			}
 		}
 	}
-}
+}*/

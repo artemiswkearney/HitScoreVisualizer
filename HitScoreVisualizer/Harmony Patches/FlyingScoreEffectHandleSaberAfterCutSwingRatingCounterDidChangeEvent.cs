@@ -1,11 +1,11 @@
-using HarmonyLib;
+/*using HarmonyLib;
 using HitScoreVisualizer.Services;
 using UnityEngine;
 
 namespace HitScoreVisualizer.Harmony_Patches
 {
 	[HarmonyPatch(typeof(FlyingScoreEffect))]
-	[HarmonyPatch("HandleSaberSwingRatingCounterDidChangeEvent", MethodType.Normal)]
+	[HarmonyPatch(nameof(FlyingScoreEffect.HandleSaberSwingRatingCounterDidChange), MethodType.Normal)]
 	internal class FlyingScoreEffectHandleSaberAfterCutSwingRatingCounterDidChangeEvent
 	{
 // ReSharper disable InconsistentNaming
@@ -28,4 +28,4 @@ namespace HitScoreVisualizer.Harmony_Patches
 			return false;
 		}
 	}
-}
+}*/
