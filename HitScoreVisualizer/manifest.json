@@ -7,9 +7,9 @@
 	"gameVersion": "1.13.2",
 	"version": "3.0.7",
 	"dependsOn": {
-		"BSIPA": "^4.1.4",
-		"BeatSaberMarkupLanguage": "^1.4.5",
-		"SiraUtil": "^2.4.0"
+		"BSIPA": "^4.1.5",
+		"BeatSaberMarkupLanguage": "^1.5.0",
+		"SiraUtil": "^2.5.2"
 	},
 	"conflictsWith": {
 		"NalulunaFlyingScore": "*"
