@@ -26,8 +26,9 @@ namespace HitScoreVisualizer.Services
 		internal Version MinimumMigratableVersion { get; }
 		internal Version MaximumMigrationNeededVersion { get; }
 
+		private Configuration? _currentConfig;
+
 		internal string? CurrentConfigPath => _hsvConfig.ConfigFilePath;
-		internal static Configuration? CurrentConfig { get; private set; }
 
 		public ConfigProvider()
 		{
@@ -104,7 +105,7 @@ namespace HitScoreVisualizer.Services
 
 		public Configuration? GetCurrentConfig()
 		{
-			return CurrentConfig;
+			return _currentConfig;
 		}
 
 		internal async Task<IEnumerable<ConfigFileInfo>> ListAvailableConfigs()
@@ -161,13 +162,13 @@ namespace HitScoreVisualizer.Services
 				}
 			}
 
-			CurrentConfig = configFileInfo.Configuration;
+			_currentConfig = configFileInfo.Configuration;
 			_hsvConfig.ConfigFilePath = configFileInfo.ConfigPath;
 		}
 
 		internal void UnselectUserConfig()
 		{
-			CurrentConfig = null;
+			_currentConfig = null;
 			_hsvConfig.ConfigFilePath = null;
 		}
 
