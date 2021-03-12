@@ -7,6 +7,6 @@
 		ValidationFailed,
 		NeedsMigration,
 		Compatible,
-		NewerVersion,
+		NewerVersion
 	}
 }
