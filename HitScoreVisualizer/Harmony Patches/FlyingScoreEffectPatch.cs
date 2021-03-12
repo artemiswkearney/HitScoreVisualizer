@@ -18,7 +18,18 @@ namespace HitScoreVisualizer.Harmony_Patches
 	[HarmonyPatch(typeof(EffectPoolsManualInstaller), nameof(EffectPoolsManualInstaller.ManualInstallBindings))]
 	internal class FlyingScoreEffectPatch
 	{
+		private static readonly MethodInfo MemoryPoolBinderMethod = typeof(DiContainer).GetMethods()
+			.First(x => x.Name == nameof(DiContainer.BindMemoryPool) && x.IsGenericMethod && x.GetGenericArguments().Length == 2)
+			.MakeGenericMethod(typeof(FlyingScoreEffect), typeof(FlyingScoreEffect.Pool));
+
 		private static readonly MethodInfo MemoryPoolBinderReplacement = SymbolExtensions.GetMethodInfo(() => MemoryPoolBinderStub(null!));
+
+
+		private static readonly MethodInfo WithInitialSizeMethod = typeof(MemoryPoolInitialSizeMaxSizeBinder<FlyingScoreEffect>)
+			.GetMethod(nameof(MemoryPoolInitialSizeMaxSizeBinder<FlyingScoreEffect>.WithInitialSize), new[]
+			{
+				typeof(int)
+			})!;
 
 		private static readonly MethodInfo WithInitialSizeReplacement = SymbolExtensions.GetMethodInfo(() => WithInitialSizeStub(null!, 0));
 
@@ -57,12 +68,27 @@ namespace HitScoreVisualizer.Harmony_Patches
 		[HarmonyTranspiler]
 		internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			var codes = instructions.ToList();
+			foreach (var codeInstruction in instructions)
+			{
+				if (codeInstruction.opcode != OpCodes.Callvirt)
+				{
+					yield return codeInstruction;
+					continue;
+				}
 
-			codes[9] = new CodeInstruction(OpCodes.Callvirt, MemoryPoolBinderReplacement);
-			codes[11] = new CodeInstruction(OpCodes.Callvirt, WithInitialSizeReplacement);
-
-			return codes.AsEnumerable();
+				if (codeInstruction.Calls(MemoryPoolBinderMethod))
+				{
+					yield return new CodeInstruction(OpCodes.Callvirt, MemoryPoolBinderReplacement);
+				}
+				else if (codeInstruction.Calls(WithInitialSizeMethod))
+				{
+					yield return new CodeInstruction(OpCodes.Callvirt, WithInitialSizeReplacement);
+				}
+				else
+				{
+					yield return codeInstruction;
+				}
+			}
 		}
 
 		// ReSharper disable once UnusedMethodReturnValue.Local
