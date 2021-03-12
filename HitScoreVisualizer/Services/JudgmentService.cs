@@ -2,26 +2,27 @@ using System.Collections.Generic;
 using System.Text;
 using HitScoreVisualizer.Extensions;
 using HitScoreVisualizer.Settings;
-using IPA.Utilities;
 using TMPro;
 using UnityEngine;
 
 namespace HitScoreVisualizer.Services
 {
-	internal static class JudgmentService
+	internal class JudgmentService
 	{
-		private static readonly FieldAccessor<FlyingScoreEffect, TextMeshPro>.Accessor FlyingScoreEffectText = FieldAccessor<FlyingScoreEffect, TextMeshPro>.GetAccessor("_text");
+		private readonly Configuration? _config;
 
-		public static void Judge(FlyingScoreEffect scoreEffect, int score, int before, int after, int accuracy, float timeDependence)
+		public JudgmentService(ConfigProvider configProvider)
 		{
-			var instance = ConfigProvider.CurrentConfig;
-			if (instance == null)
+			_config = configProvider.GetCurrentConfig();
+		}
+
+		internal void Judge(ref TextMeshPro text, ref Color color, int score, int before, int after, int accuracy, float timeDependence)
+		{
+			if (_config == null)
 			{
 				return;
 			}
 
-			// as of 0.13, the TextMeshPro is private; use reflection to grab it out of a private field
-			var text = FlyingScoreEffectText(ref scoreEffect);
 			// enable rich text
 			text.richText = true;
 			// disable word wrap, make sure full text displays
@@ -29,13 +30,12 @@ namespace HitScoreVisualizer.Services
 			text.overflowMode = TextOverflowModes.Overflow;
 
 			// save in case we need to fade
-			var index = instance.Judgments!.FindIndex(j => j.Threshold <= score);
-			var judgment = index >= 0 ? instance.Judgments[index] : Judgment.Default;
+			var index = _config.Judgments!.FindIndex(j => j.Threshold <= score);
+			var judgment = index >= 0 ? _config.Judgments[index] : Judgment.Default;
 
-			Color color;
 			if (judgment.Fade)
 			{
-				var fadeJudgment = instance.Judgments[index - 1];
+				var fadeJudgment = _config.Judgments[index - 1];
 				var baseColor = judgment.Color.ToColor();
 				var fadeColor = fadeJudgment.Color.ToColor();
 				var lerpDistance = Mathf.InverseLerp(judgment.Threshold, fadeJudgment.Threshold, score);
@@ -46,12 +46,9 @@ namespace HitScoreVisualizer.Services
 				color = judgment.Color.ToColor();
 			}
 
-			FieldAccessor<FlyingScoreEffect, Color>.Set(scoreEffect, "_color", color);
-			scoreEffect.SetField("_color", color);
-
-			text.text = instance.DisplayMode switch
+			text.text = _config.DisplayMode switch
 			{
-				"format" => DisplayModeFormat(score, before, after, accuracy, timeDependence, judgment, instance),
+				"format" => DisplayModeFormat(score, before, after, accuracy, timeDependence, judgment, _config),
 				"textOnly" => judgment.Text,
 				"numeric" => score.ToString(),
 				"scoreOnTop" => $"{score}\n{judgment.Text}\n",

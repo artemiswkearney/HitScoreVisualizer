@@ -35,6 +35,7 @@ namespace HitScoreVisualizer
 
 			zenject.OnApp<HsvAppInstaller>().WithParameters(logger, config.Generated<HSVConfig>());
 			zenject.OnMenu<HsvMenuInstaller>();
+			zenject.OnGame<HsvGameInstaller>();
 		}
 
 		[OnEnable]
