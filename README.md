@@ -8,7 +8,7 @@ A fairly simple mod that allows you to heavily customize the appearance of hit s
 This mod requires a few other mods in order to work.
 
 - BeatSaberMarkupLanguage v1.5.0 or higher
-- BSIPA v4.1.5 or higher
+- BSIPA v4.1.6 or higher
 - SiraUtil v2.5.2 or higher
 
 The installation is fairly simple.
