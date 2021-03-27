@@ -35,7 +35,7 @@ namespace HitScoreVisualizer.Models
 			if (_configuration != null)
 			{
 				// Apply judgments a total of twice - once when the effect is created, once when it finishes.
-				Judge(_noteCutInfo.Value.swingRatingCounter);
+				Judge(_noteCutInfo.Value.swingRatingCounter, 30);
 			}
 		}
 
@@ -70,9 +70,10 @@ namespace HitScoreVisualizer.Models
 			base.HandleSaberSwingRatingCounterDidFinish(saberSwingRatingCounter);
 		}
 
-		private void Judge(ISaberSwingRatingCounter swingRatingCounter)
+		private void Judge(ISaberSwingRatingCounter swingRatingCounter, int? assumedAfterCutScore = null)
 		{
 			ScoreModel.RawScoreWithoutMultiplier(swingRatingCounter, _cutDistanceToCenter, out var before, out var after, out var accuracy);
+			after = assumedAfterCutScore ?? after;
 			var total = before + after + accuracy;
 			var timeDependence = Mathf.Abs(_noteCutInfo!.Value.cutNormal.z);
 			_judgmentService.Judge(ref _text, ref _color, total, before, after, accuracy, timeDependence);

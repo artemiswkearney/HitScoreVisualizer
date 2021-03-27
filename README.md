@@ -119,14 +119,14 @@ You can use that file as a starting point in case you want to customize it. Just
 
 ## Developers
 
-To build this project you will need to create a `HitScoreVisualizer/HitScoreVisualizer.csproj.user` file specifying where the game is located:
+To build this project you will need to copy `HitScoreVisualizer/HitScoreVisualizer.csproj.user.example` to 'HitScoreVisualizer.csproj.user' and specify where the game is located:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<!-- Change this path if necessary. Make sure it ends with a backslash. -->
-		<GameDirPath>D:\Program Files (x86)\Steam\steamapps\common\Beat Saber\</GameDirPath>
+		<BeatSaberDir>C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\</BeatSaberDir>
 	</PropertyGroup>
 </Project>
 ```
