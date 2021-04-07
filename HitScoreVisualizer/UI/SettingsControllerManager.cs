@@ -39,7 +39,7 @@ namespace HitScoreVisualizer.UI
 				return;
 			}
 
-			if (MenuButtons.IsSingletonAvailable)
+			if (MenuButtons.IsSingletonAvailable && BSMLParser.IsSingletonAvailable)
 			{
 				MenuButtons.instance.UnregisterButton(_hsvButton);
 			}
