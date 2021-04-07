@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<!-- Change this path if necessary. Make sure it ends with a backslash. -->
-		<BeatSaberDir>C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\</BeatSaberDir>
-	</PropertyGroup>
-</Project>

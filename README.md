@@ -119,14 +119,18 @@ You can use that file as a starting point in case you want to customize it. Just
 
 ## Developers
 
-To build this project you will need to copy `HitScoreVisualizer/HitScoreVisualizer.csproj.user.example` to 'HitScoreVisualizer.csproj.user' and specify where the game is located:
+To build this project you will need to create a `HitScoreVisualizer/HitScoreVisualizer.csproj.user` file specifying where the game is located.
+This can be done using either of the following options:
+
+1) Create the file using the [BSMT Visual Studio extension](https://github.com/Zingabopp/BeatSaberModdingTools).
+2) Manually create the file, copy the xml below into the file and change the path to your accomodate for your installation. The file shows up as a missing file in the solution explorer, so it should be easy to spot.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<!-- Change this path if necessary. Make sure it ends with a backslash. -->
-		<BeatSaberDir>C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\</BeatSaberDir>
+		<BeatSaberDir>D:\Program Files (x86)\Steam\steamapps\common\Beat Saber\</BeatSaberDir>
 	</PropertyGroup>
 </Project>
 ```
