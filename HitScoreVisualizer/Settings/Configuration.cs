@@ -20,12 +20,12 @@ namespace HitScoreVisualizer.Settings
 			TimeDependenceDecimalOffset = 2,
 			Judgments = new List<Judgment>
 			{
-				new Judgment {Threshold = 115, Text = "%BFantastic%A%n%s", Color = new List<float> {1.0f, 1.0f, 1.0f, 1.0f}},
-				new Judgment {Threshold = 101, Text = "<size=80%>%BExcellent%A</size>%n%s", Color = new List<float> {0.0f, 1.0f, 0.0f, 1.0f}},
-				new Judgment {Threshold = 90, Text = "<size=80%>%BGreat%A</size>%n%s", Color = new List<float> {1.0f, 0.980392158f, 0.0f, 1.0f}},
-				new Judgment {Threshold = 80, Text = "<size=80%>%BGood%A</size>%n%s", Color = new List<float> {1.0f, 0.6f, 0.0f, 1.0f}, Fade = true},
-				new Judgment {Threshold = 60, Text = "<size=80%>%BDecent%A</size>%n%s", Color = new List<float> {1.0f, 0.0f, 0.0f, 1.0f}, Fade = true},
-				new Judgment {Text = "<size=80%>%BWay Off%A</size>%n%s", Color = new List<float> {0.5f, 0.0f, 0.0f, 1.0f}, Fade = true}
+				new Judgment(threshold: 115, text: "%BFantastic%A%n%s", color: new List<float> {1.0f, 1.0f, 1.0f, 1.0f}),
+				new Judgment(threshold: 101, text: "<size=80%>%BExcellent%A</size>%n%s", color: new List<float> {0.0f, 1.0f, 0.0f, 1.0f}),
+				new Judgment(threshold: 90, text: "<size=80%>%BGreat%A</size>%n%s", color: new List<float> {1.0f, 0.980392158f, 0.0f, 1.0f}),
+				new Judgment(threshold: 80, text: "<size=80%>%BGood%A</size>%n%s", color: new List<float> {1.0f, 0.6f, 0.0f, 1.0f}, fade: true),
+				new Judgment(threshold: 60, text: "<size=80%>%BDecent%A</size>%n%s", color: new List<float> {1.0f, 0.0f, 0.0f, 1.0f}, fade: true),
+				new Judgment(text: "<size=80%>%BWay Off%A</size>%n%s", color: new List<float> {0.5f, 0.0f, 0.0f, 1.0f}, fade: true)
 			},
 			BeforeCutAngleJudgments = new List<JudgmentSegment> {new JudgmentSegment {Threshold = 70, Text = "+"}, new JudgmentSegment {Text = " "}},
 			AccuracyJudgments = new List<JudgmentSegment> {new JudgmentSegment {Threshold = 15, Text = " + "}, new JudgmentSegment {Text = " "}},

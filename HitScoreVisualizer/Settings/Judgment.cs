@@ -16,12 +16,12 @@ namespace HitScoreVisualizer.Settings
 
 		// The text to display (if judgment text is enabled).
 		[JsonProperty("text")]
-		public string Text { get; internal set; } = string.Empty;
+		public string Text { get; internal set; }
 
 		// 4 floats, 0-1; red, green, blue, glow (not transparency!)
 		// leaving this out should look obviously wrong
 		[JsonProperty("color")]
-		public List<float> Color { get; internal set; } = new List<float>(4);
+		public List<float> Color { get; internal set; }
 
 		// If true, the text color will be interpolated between this judgment's color and the previous
 		// based on how close to the next threshold it is.
@@ -29,5 +29,14 @@ namespace HitScoreVisualizer.Settings
 		// plugin.
 		[JsonProperty("fade")]
 		public bool Fade { get; internal set; }
+
+		[JsonConstructor]
+		internal Judgment(int threshold = 0, string? text = null, List<float>? color = null, bool fade = false)
+		{
+			Threshold = threshold;
+			Text = text ?? string.Empty;
+			Color = color ?? new List<float>();
+			Fade = fade;
+		}
 	}
 }
