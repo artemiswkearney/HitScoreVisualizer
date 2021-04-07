@@ -10,7 +10,7 @@ namespace HitScoreVisualizer.Models
 		private JudgmentService _judgmentService = null!;
 		private Configuration? _configuration;
 
-		private NoteCutInfo _noteCutInfo;
+		private NoteCutInfo? _noteCutInfo;
 
 		[Inject]
 		internal void Construct(JudgmentService judgmentService, ConfigProvider configProvider)
@@ -30,14 +30,12 @@ namespace HitScoreVisualizer.Models
 				transform.position = targetPos;
 			}
 
-			// =====================================================================================================================
-
 			base.InitAndPresent(noteCutInfo, multiplier, duration, targetPos, rotation, color);
 
 			if (_configuration != null)
 			{
 				// Apply judgments a total of twice - once when the effect is created, once when it finishes.
-				Judge(_noteCutInfo.swingRatingCounter);
+				Judge(_noteCutInfo.Value.swingRatingCounter);
 			}
 		}
 
@@ -76,7 +74,7 @@ namespace HitScoreVisualizer.Models
 		{
 			ScoreModel.RawScoreWithoutMultiplier(swingRatingCounter, _cutDistanceToCenter, out var before, out var after, out var accuracy);
 			var total = before + after + accuracy;
-			var timeDependence = Mathf.Abs(_noteCutInfo.cutNormal.z);
+			var timeDependence = Mathf.Abs(_noteCutInfo!.Value.cutNormal.z);
 			_judgmentService.Judge(ref _text, ref _color, total, before, after, accuracy, timeDependence);
 		}
 	}
