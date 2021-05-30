@@ -30,13 +30,29 @@ namespace HitScoreVisualizer.Models
 				transform.position = targetPos;
 			}
 
-			base.InitAndPresent(noteCutInfo, multiplier, duration, targetPos, rotation, color);
+			_color = color;
+			_saberSwingRatingCounter = noteCutInfo.swingRatingCounter;
+			_cutDistanceToCenter = noteCutInfo.cutDistanceToCenter;
+			_saberSwingRatingCounter.RegisterDidChangeReceiver(this);
+			_saberSwingRatingCounter.RegisterDidFinishReceiver(this);
+			_registeredToCallbacks = true;
 
-			if (_configuration != null)
+			if (_configuration == null)
 			{
+				ScoreModel.RawScoreWithoutMultiplier(_saberSwingRatingCounter, _cutDistanceToCenter, out var beforeCutRawScore, out var afterCutRawScore, out var cutDistanceRawScore);
+				_text.text = GetScoreText(beforeCutRawScore + afterCutRawScore);
+				_maxCutDistanceScoreIndicator.enabled = cutDistanceRawScore == 15;
+				_colorAMultiplier = beforeCutRawScore + afterCutRawScore > 103.5 ? 1f : 0.3f;
+			}
+			else
+			{
+				_maxCutDistanceScoreIndicator.enabled = false;
+
 				// Apply judgments a total of twice - once when the effect is created, once when it finishes.
 				Judge(_noteCutInfo.Value.swingRatingCounter, 30);
 			}
+
+			InitAndPresent(duration, targetPos, rotation, false);
 		}
 
 		protected override void ManualUpdate(float t)
