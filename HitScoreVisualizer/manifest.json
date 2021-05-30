@@ -8,8 +8,8 @@
 	"version": "3.0.10",
 	"dependsOn": {
 		"BSIPA": "^4.1.6",
-		"BeatSaberMarkupLanguage": "^1.5.2",
-		"SiraUtil": "^2.5.3"
+		"BeatSaberMarkupLanguage": "^1.5.3",
+		"SiraUtil": "^2.5.5"
 	},
 	"conflictsWith": {
 		"NalulunaFlyingScore": "*"
