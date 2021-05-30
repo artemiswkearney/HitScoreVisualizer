@@ -33,11 +33,11 @@ namespace HitScoreVisualizer.Harmony_Patches
 
 		private static readonly MethodInfo WithInitialSizeReplacement = SymbolExtensions.GetMethodInfo(() => WithInitialSizeStub(null!, 0));
 
-// ReSharper disable once SuggestBaseTypeForParameter
-// ReSharper disable InconsistentNaming
+		// ReSharper disable once SuggestBaseTypeForParameter
+		// ReSharper disable InconsistentNaming
 		[HarmonyPrefix]
 		internal static void Prefix(FlyingScoreEffect ____flyingScoreEffectPrefab)
-// ReSharper disable InconsistentNaming
+		// ReSharper disable InconsistentNaming
 		{
 			var gameObject = ____flyingScoreEffectPrefab.gameObject;
 
