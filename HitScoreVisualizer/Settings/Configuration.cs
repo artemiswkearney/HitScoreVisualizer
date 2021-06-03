@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using Hive.Versioning;
 using Newtonsoft.Json;
 using UnityEngine;
-using Version = SemVer.Version;
 
 namespace HitScoreVisualizer.Settings
 {
@@ -37,13 +37,13 @@ namespace HitScoreVisualizer.Settings
 		// plugin, the file will be automatically converted. Conversion is not guaranteed to occur, or be
 		// accurate, across major versions.
 		[JsonProperty("majorVersion", DefaultValueHandling = DefaultValueHandling.Include)]
-		public int MajorVersion { get; private set; } = Plugin.Version.Major;
+		public ulong MajorVersion { get; private set; } = Plugin.Version.Major;
 
 		[JsonProperty("minorVersion", DefaultValueHandling = DefaultValueHandling.Include)]
-		public int MinorVersion { get; private set; } = Plugin.Version.Minor;
+		public ulong MinorVersion { get; private set; } = Plugin.Version.Minor;
 
 		[JsonProperty("patchVersion", DefaultValueHandling = DefaultValueHandling.Include)]
-		public int PatchVersion { get; private set; } = Plugin.Version.Patch;
+		public ulong PatchVersion { get; private set; } = Plugin.Version.Patch;
 
 		[JsonIgnore]
 		internal Version Version

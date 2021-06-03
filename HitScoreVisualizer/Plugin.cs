@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
 using System.Reflection;
-using HitScoreVisualizer.Extensions;
 using HitScoreVisualizer.Installers;
 using HitScoreVisualizer.Settings;
+using Hive.Versioning;
 using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
@@ -10,7 +10,6 @@ using IPA.Loader;
 using IPA.Logging;
 using SiraUtil.Attributes;
 using SiraUtil.Zenject;
-using Version = SemVer.Version;
 
 namespace HitScoreVisualizer
 {
@@ -22,11 +21,9 @@ namespace HitScoreVisualizer
 
 		private static Harmony? _harmonyInstance;
 		private static PluginMetadata? _metadata;
-		private static string? _name;
-		private static Version? _version;
 
-		public static string Name => _name ??= _metadata?.Name ?? Assembly.GetExecutingAssembly().GetName().Name;
-		public static Version Version => _version ??= _metadata?.Version ?? Assembly.GetExecutingAssembly().GetName().Version.ToSemVerVersion();
+		public static string Name => _metadata?.Name!;
+		public static Version Version => _metadata?.HVersion!;
 
 		[Init]
 		public void Init(Logger logger, Config config, PluginMetadata pluginMetadata, Zenjector zenject)

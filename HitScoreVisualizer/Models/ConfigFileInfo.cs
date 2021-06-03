@@ -1,7 +1,7 @@
 ﻿using System;
 using BeatSaberMarkupLanguage.Attributes;
 using HitScoreVisualizer.Settings;
-using Version = SemVer.Version;
+using Version = Hive.Versioning.Version;
 
 namespace HitScoreVisualizer.Models
 {

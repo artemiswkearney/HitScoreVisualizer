@@ -69,8 +69,8 @@
 			<HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="SemVer">
-			<HintPath>$(BeatSaberDir)\Libs\SemVer.dll</HintPath>
+		<Reference Include="Hive.Versioning">
+			<HintPath>$(BeatSaberDir)\Libs\Hive.Versioning.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="BSML">

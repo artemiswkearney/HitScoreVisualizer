@@ -9,7 +9,7 @@ using IPA.Utilities;
 using Newtonsoft.Json;
 using SiraUtil.Tools;
 using Zenject;
-using Version = SemVer.Version;
+using Version = Hive.Versioning.Version;
 
 namespace HitScoreVisualizer.Services
 {

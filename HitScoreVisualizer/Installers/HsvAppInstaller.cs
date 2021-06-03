@@ -22,7 +22,6 @@ namespace HitScoreVisualizer.Installers
 			Container.BindLoggerAsSiraLogger(_logger);
 			Container.BindInstance(_hsvConfig);
 			Container.BindInterfacesAndSelfTo<ConfigProvider>().AsSingle();
-
 		}
 	}
 }
