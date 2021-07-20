@@ -135,7 +135,7 @@ This can be done using either of the following options:
 </Project>
 ```
 
-### Changelog
+## Changelog
 x.x.x: Probably created and such, no clue here...<br>
 2.0.2: Bug fixes and performance improvements. If you've been noticing lag, try disabling the fade option on all Judgments in the config.<br>
 2.1.0: Added display mode "format" (see below).<br>
@@ -144,10 +144,13 @@ x.x.x: Probably created and such, no clue here...<br>
 x.x.x: Probably a few more changes and such, no clue here either...<br>
 3.0.0: Big rewrite! Support for changing configs at runtime, better validation, ...
 
+## Useful links
 
-### Credits
+[HSV Config Creator by @MoreOwO](https://github.com/MoreOwO/HSV-Config-Creator/releases/latest): A program that helps you create configs for HSV.
+
+## Credits
 Credit where credit is due:
- - @artemiswkearney for writing the original mod
+ - [@artemiswkearney](https://github.com/artemiswkearney) for writing the original mod
  - @AntRazor for the mod idea/request and default config input in the original mod
  - @wulkanat for the default config input in the original mod
  - Everyone in #pc-mod-dev (and the rest of the server) for the love and support. ❤
