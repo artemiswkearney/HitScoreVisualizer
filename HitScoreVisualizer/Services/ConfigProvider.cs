@@ -15,8 +15,8 @@ namespace HitScoreVisualizer.Services
 {
 	public class ConfigProvider : IInitializable
 	{
-		private SiraLog _siraLog = null!;
-		private HSVConfig _hsvConfig = null!;
+		private readonly SiraLog _siraLog;
+		private readonly HSVConfig _hsvConfig;
 
 		private readonly string _hsvConfigsFolderPath;
 		private readonly JsonSerializerSettings _jsonSerializerSettings;
@@ -30,8 +30,11 @@ namespace HitScoreVisualizer.Services
 
 		internal string? CurrentConfigPath => _hsvConfig.ConfigFilePath;
 
-		public ConfigProvider()
+		internal ConfigProvider(SiraLog siraLog, HSVConfig hsvConfig)
 		{
+			_siraLog = siraLog;
+			_hsvConfig = hsvConfig;
+
 			_jsonSerializerSettings = new JsonSerializerSettings {DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Formatting = Formatting.Indented};
 			_hsvConfigsFolderPath = Path.Combine(UnityGame.UserDataPath, nameof(HitScoreVisualizer));
 
@@ -44,13 +47,6 @@ namespace HitScoreVisualizer.Services
 
 			_minimumMigratableVersion = _migrationActions.Keys.Min();
 			_maximumMigrationNeededVersion = _migrationActions.Keys.Max();
-		}
-
-		[Inject]
-		internal void Construct(SiraLog siraLog, HSVConfig hsvConfig)
-		{
-			_siraLog = siraLog;
-			_hsvConfig = hsvConfig;
 		}
 
 		public async void Initialize()

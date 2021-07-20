@@ -35,7 +35,6 @@ namespace HitScoreVisualizer.Settings
 		// If the version number (excluding patch version) of the config is higher than that of the plugin,
 		// the config will not be loaded. If the version number of the config is lower than that of the
 		// plugin, the file will be automatically converted. Conversion is not guaranteed to occur, or be
-
 		// accurate, across major versions.
 		[JsonProperty("majorVersion", DefaultValueHandling = DefaultValueHandling.Include)]
 		public int MajorVersion { get; private set; } = Plugin.Version.Major;
