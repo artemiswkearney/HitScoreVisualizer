@@ -1,4 +1,4 @@
-﻿{
+{
 	"$schema": "https://raw.githubusercontent.com/beat-saber-modding-group/BSIPA-MetadataFileSchema/master/Schema.json",
 	"id": "HitScoreVisualizer",
 	"name": "HitScoreVisualizer",
