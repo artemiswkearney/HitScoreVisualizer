@@ -7,7 +7,7 @@ on:
         paths:
             - 'HitScoreVisualizer.sln'
             - 'HitScoreVisualizer/**'
-            - '.github/workflows/main.yml'
+            - '.github/workflows/master.yml'
 
 jobs:
     Build:
