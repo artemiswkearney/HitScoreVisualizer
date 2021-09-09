@@ -1,5 +1,5 @@
-using System.Reflection;
 using HarmonyLib;
+using HitScoreVisualizer.HarmonyPatches;
 using HitScoreVisualizer.Installers;
 using HitScoreVisualizer.Settings;
 using Hive.Versioning;
@@ -38,8 +38,7 @@ namespace HitScoreVisualizer
 		[OnEnable]
 		public void OnEnable()
 		{
-			_harmonyInstance = new Harmony(HARMONY_ID);
-			_harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
+			_harmonyInstance = Harmony.CreateAndPatchAll(typeof(FlyingScoreEffectPatch), HARMONY_ID);
 		}
 
 		[OnDisable]
