@@ -63,7 +63,7 @@ namespace HitScoreVisualizer.UI
 		internal bool HasLoadedConfigs => !LoadingConfigs;
 
 		[UIValue("is-valid-config-selected")]
-		internal bool CanConfigGetSelected => _selectedConfigFileInfo?.ConfigPath != _configProvider.CurrentConfigPath && _configProvider.ConfigSelectable(_selectedConfigFileInfo?.State);
+		internal bool CanConfigGetSelected => _selectedConfigFileInfo?.ConfigPath != _configProvider.CurrentConfigPath && ConfigProvider.ConfigSelectable(_selectedConfigFileInfo?.State);
 
 		[UIValue("has-config-loaded")]
 		internal bool HasConfigCurrently => !string.IsNullOrWhiteSpace(_configProvider.CurrentConfigPath);
@@ -101,7 +101,7 @@ namespace HitScoreVisualizer.UI
 		[UIAction("pick-config")]
 		internal async void PickConfig()
 		{
-			if (CanConfigGetSelected)
+			if (CanConfigGetSelected && _selectedConfigFileInfo != null)
 			{
 				await _configProvider.SelectUserConfig(_selectedConfigFileInfo).ConfigureAwait(false);
 				await LoadInternal().ConfigureAwait(false);

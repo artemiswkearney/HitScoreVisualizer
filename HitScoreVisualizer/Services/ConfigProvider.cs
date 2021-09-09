@@ -128,28 +128,26 @@ namespace HitScoreVisualizer.Services
 			return configFileInfoList;
 		}
 
-		internal bool ConfigSelectable(ConfigState? state)
+		internal static bool ConfigSelectable(ConfigState? state)
 		{
-			switch (state)
+			return state switch
 			{
-				case ConfigState.Compatible:
-				case ConfigState.NeedsMigration:
-					return true;
-				default:
-					return false;
-			}
+				ConfigState.Compatible => true,
+				ConfigState.NeedsMigration => true,
+				_ => false
+			};
 		}
 
-		internal async Task SelectUserConfig(ConfigFileInfo? configFileInfo)
+		internal async Task SelectUserConfig(ConfigFileInfo configFileInfo)
 		{
 			// safe-guarding just to be sure
-			if (!ConfigSelectable(configFileInfo?.State))
+			if (!ConfigSelectable(configFileInfo.State))
 			{
 				_hsvConfig.ConfigFilePath = null;
 				return;
 			}
 
-			if (configFileInfo!.State == ConfigState.NeedsMigration)
+			if (configFileInfo.State == ConfigState.NeedsMigration)
 			{
 				if (configFileInfo.Configuration!.IsDefaultConfig)
 				{
