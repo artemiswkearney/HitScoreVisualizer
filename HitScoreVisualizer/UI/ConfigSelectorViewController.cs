@@ -37,18 +37,7 @@ namespace HitScoreVisualizer.UI
 			_siraLog = siraLog;
 			_hsvConfig = hsvConfig;
 			_configProvider = configProvider;
-
-			SetMigrationButtonColors();
 		}
-
-		[UIValue("migration-button-color-face")]
-		internal string QueueButtonColorFace { get; set; } = ButtonColorValueConverter.Convert();
-
-		[UIValue("migration-button-color-glow")]
-		internal string QueueButtonColorGlow { get; set; } = ButtonColorValueConverter.Convert();
-
-		[UIValue("migration-button-color-stroke")]
-		internal string QueueButtonColorStroke { get; set; } = ButtonColorValueConverter.Convert();
 
 		[UIComponent("configs-list")]
 		public CustomCellListTableData? customListTableData;
@@ -83,13 +72,6 @@ namespace HitScoreVisualizer.UI
 			_selectedConfigFileInfo = (ConfigFileInfo)@object;
 			NotifyPropertyChanged(nameof(CanConfigGetSelected));
 			NotifyPropertyChanged(nameof(CanConfigGetYeeted));
-		}
-
-		[UIAction("toggle-migration")]
-		internal void ToggleMigration()
-		{
-			_hsvConfig.SaveOnMigration = !_hsvConfig.SaveOnMigration;
-			SetMigrationButtonColors();
 		}
 
 		[UIAction("reload-list")]
@@ -207,15 +189,6 @@ namespace HitScoreVisualizer.UI
 				NotifyPropertyChanged(nameof(HasConfigCurrently));
 				NotifyPropertyChanged(nameof(LoadedConfigText));
 			}).ConfigureAwait(false);
-		}
-
-		private void SetMigrationButtonColors()
-		{
-			QueueButtonColorFace = QueueButtonColorGlow = QueueButtonColorStroke = ButtonColorValueConverter.Convert(_hsvConfig.SaveOnMigration);
-
-			NotifyPropertyChanged(nameof(QueueButtonColorFace));
-			NotifyPropertyChanged(nameof(QueueButtonColorGlow));
-			NotifyPropertyChanged(nameof(QueueButtonColorStroke));
 		}
 	}
 }

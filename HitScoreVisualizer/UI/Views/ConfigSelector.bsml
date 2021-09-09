@@ -42,39 +42,25 @@
 
 				<button pref-width='28'
 						word-wrapping='false'
-						child-align='UpperCenter'
-						face-color="~migration-button-color-face"
-						font-size="3.25"
-						text="Save on migration"
-						hover-hint="Whether or not to overwrite the original file after migration."
-						on-click="toggle-migration"/>
-			</vertical>
+						child-align='MiddleCenter'
+						text='Refresh'
+						hover-hint="Refreshes the list"
+						on-click='reload-list'/>
 
-			<button pref-width='28'
-					word-wrapping='false'
-					child-align='MiddleCenter'
-					text='Refresh'
-					hover-hint="Refreshes the list"
-					on-click='reload-list'/>
+				<button pref-width='28'
+						word-wrapping='false'
+						text='Select'
+						hover-hint="Loads the currently selected config."
+						interactable='~is-valid-config-selected'
+						on-click='pick-config'/>
 
-			<button pref-width='28'
-					word-wrapping='false'
-					text='Select'
-					hover-hint="Loads the currently selected config."
-					interactable='~is-valid-config-selected'
-					on-click='pick-config'/>
-
-			<button pref-width='28'
-					word-wrapping='false'
-					face-color="#BD2881"
-					text='Reset to none'
-					hover-hint="Unselects the currently loaded config, basically reverting to the default game behavior."
-					interactable='~has-config-loaded'
-					on-click='unpick-config'/>
-
-			<vertical child-align='LowerCenter'
-					  child-expand-height='true'
-					  child-control-height='false'>
+				<button pref-width='28'
+						word-wrapping='false'
+						face-color="#BD2881"
+						text='Reset to none'
+						hover-hint="Unselects the currently loaded config, basically reverting to the default game behavior."
+						interactable='~has-config-loaded'
+						on-click='unpick-config'/>
 
 				<button pref-width='28'
 						word-wrapping='false'
@@ -84,14 +70,22 @@
 						hover-hint="Yeets the config out of existence."
 						interactable="~is-config-yeetable"
 						event-click="show-yeet-modal"/>
+
 			</vertical>
 
-			<button pref-width="28"
-					word-wrapping="false"
-					face-color="~bloom-toggle-face-color"
-					text="HitScore Bloom"
-					hover-hint="Toggles the bloom effect on HitScores."
-					on-click="toggle-bloom-effect"/>
+			<vertical child-align='LowerCenter'
+					  child-expand-height='true'
+					  child-control-height='false'>
+
+				<button pref-width="28"
+						word-wrapping="false"
+						face-color="~bloom-toggle-face-color"
+						text="HitScore Bloom"
+						hover-hint="Toggles the bloom effect on HitScores."
+						on-click="toggle-bloom-effect"/>
+			</vertical>
+
+
 		</vertical>
 
 		<modal size-delta-x="50"
