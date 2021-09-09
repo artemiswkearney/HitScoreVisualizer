@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using HitScoreVisualizer.Helpers.Json;
 using HitScoreVisualizer.Models;
 using HitScoreVisualizer.Settings;
 using IPA.Utilities;
@@ -35,7 +36,14 @@ namespace HitScoreVisualizer.Services
 			_siraLog = siraLog;
 			_hsvConfig = hsvConfig;
 
-			_jsonSerializerSettings = new JsonSerializerSettings {DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Formatting = Formatting.Indented};
+			_jsonSerializerSettings = new JsonSerializerSettings
+			{
+				DefaultValueHandling = DefaultValueHandling.Include,
+				NullValueHandling = NullValueHandling.Ignore,
+				Formatting = Formatting.Indented,
+				Converters = new List<JsonConverter> { new Vector3Converter() },
+				ContractResolver = ShouldNotSerializeContractResolver.Instance
+			};
 			_hsvConfigsFolderPath = Path.Combine(UnityGame.UserDataPath, nameof(HitScoreVisualizer));
 
 			_migrationActions = new Dictionary<Version, Func<Configuration, bool>>
@@ -209,13 +217,12 @@ namespace HitScoreVisualizer.Services
 			try
 			{
 				using var streamWriter = new StreamWriter(fullPath, false);
-				var content = JsonConvert.SerializeObject(configuration, Formatting.Indented);
+				var content = JsonConvert.SerializeObject(configuration, Formatting.Indented, _jsonSerializerSettings);
 				await streamWriter.WriteAsync(content).ConfigureAwait(false);
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e);
-				throw;
+				_siraLog.Error(e);
 			}
 		}
 
