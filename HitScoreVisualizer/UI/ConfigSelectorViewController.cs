@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
-using HitScoreVisualizer.Converters;
 using HitScoreVisualizer.Models;
 using HitScoreVisualizer.Services;
 using HitScoreVisualizer.Settings;

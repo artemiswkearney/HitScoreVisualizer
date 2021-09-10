@@ -225,7 +225,7 @@ namespace HitScoreVisualizer.Services
 			{
 				_siraLog.Warning(ex);
 				// Expected behaviour when file isn't an actual hsv config file...
-				return null!;
+				return null;
 			}
 		}
 
@@ -474,9 +474,9 @@ namespace HitScoreVisualizer.Services
 
 		private static bool RunMigration2_0_0(Configuration configuration)
 		{
-			configuration.BeforeCutAngleJudgments = new List<JudgmentSegment> {JudgmentSegment.Default};
-			configuration.AccuracyJudgments = new List<JudgmentSegment> {JudgmentSegment.Default};
-			configuration.AfterCutAngleJudgments = new List<JudgmentSegment> {JudgmentSegment.Default};
+			configuration.BeforeCutAngleJudgments = new List<JudgmentSegment> { JudgmentSegment.Default };
+			configuration.AccuracyJudgments = new List<JudgmentSegment> { JudgmentSegment.Default };
+			configuration.AfterCutAngleJudgments = new List<JudgmentSegment> { JudgmentSegment.Default };
 
 			return true;
 		}
