@@ -102,7 +102,7 @@ namespace HitScoreVisualizer.Services
 						formattedBuilder.Append(score);
 						break;
 					case 'p':
-						formattedBuilder.Append($"{score / 115d * 100:0}");
+						formattedBuilder.Append($"{(double) score / ScoreModel.kMaxCutRawScore * 100:0}");
 						break;
 					case '%':
 						formattedBuilder.Append("%");
