@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Hive.Versioning;
+using HitScoreVisualizer.Helpers.Json;
 using Newtonsoft.Json;
 using UnityEngine;
+using Version = Hive.Versioning.Version;
 
 namespace HitScoreVisualizer.Settings
 {
@@ -14,22 +16,21 @@ namespace HitScoreVisualizer.Settings
 			Version = Plugin.Version,
 			IsDefaultConfig = true,
 			DisplayMode = "format",
-			UseFixedPos = false,
 			DoIntermediateUpdates = true,
 			TimeDependenceDecimalPrecision = 1,
 			TimeDependenceDecimalOffset = 2,
 			Judgments = new List<Judgment>
 			{
-				new Judgment(threshold: 115, text: "%BFantastic%A%n%s", color: new List<float> {1.0f, 1.0f, 1.0f, 1.0f}),
-				new Judgment(threshold: 101, text: "<size=80%>%BExcellent%A</size>%n%s", color: new List<float> {0.0f, 1.0f, 0.0f, 1.0f}),
-				new Judgment(threshold: 90, text: "<size=80%>%BGreat%A</size>%n%s", color: new List<float> {1.0f, 0.980392158f, 0.0f, 1.0f}),
-				new Judgment(threshold: 80, text: "<size=80%>%BGood%A</size>%n%s", color: new List<float> {1.0f, 0.6f, 0.0f, 1.0f}, fade: true),
-				new Judgment(threshold: 60, text: "<size=80%>%BDecent%A</size>%n%s", color: new List<float> {1.0f, 0.0f, 0.0f, 1.0f}, fade: true),
-				new Judgment(text: "<size=80%>%BWay Off%A</size>%n%s", color: new List<float> {0.5f, 0.0f, 0.0f, 1.0f}, fade: true)
+				new Judgment(threshold: 115, text: "%BFantastic%A%n%s", color: new List<float> { 1.0f, 1.0f, 1.0f, 1.0f }),
+				new Judgment(threshold: 101, text: "<size=80%>%BExcellent%A</size>%n%s", color: new List<float> { 0.0f, 1.0f, 0.0f, 1.0f }),
+				new Judgment(threshold: 90, text: "<size=80%>%BGreat%A</size>%n%s", color: new List<float> { 1.0f, 0.980392158f, 0.0f, 1.0f }),
+				new Judgment(threshold: 80, text: "<size=80%>%BGood%A</size>%n%s", color: new List<float> { 1.0f, 0.6f, 0.0f, 1.0f }, fade: true),
+				new Judgment(threshold: 60, text: "<size=80%>%BDecent%A</size>%n%s", color: new List<float> { 1.0f, 0.0f, 0.0f, 1.0f }, fade: true),
+				new Judgment(text: "<size=80%>%BWay Off%A</size>%n%s", color: new List<float> { 0.5f, 0.0f, 0.0f, 1.0f }, fade: true)
 			},
-			BeforeCutAngleJudgments = new List<JudgmentSegment> {new JudgmentSegment {Threshold = 70, Text = "+"}, new JudgmentSegment {Text = " "}},
-			AccuracyJudgments = new List<JudgmentSegment> {new JudgmentSegment {Threshold = 15, Text = " + "}, new JudgmentSegment {Text = " "}},
-			AfterCutAngleJudgments = new List<JudgmentSegment> {new JudgmentSegment {Threshold = 30, Text = " + "}, new JudgmentSegment {Text = " "}}
+			BeforeCutAngleJudgments = new List<JudgmentSegment> { new JudgmentSegment { Threshold = 70, Text = "+" }, new JudgmentSegment { Text = " " } },
+			AccuracyJudgments = new List<JudgmentSegment> { new JudgmentSegment { Threshold = 15, Text = " + " }, new JudgmentSegment { Text = " " } },
+			AfterCutAngleJudgments = new List<JudgmentSegment> { new JudgmentSegment { Threshold = 30, Text = " + " }, new JudgmentSegment { Text = " " } }
 		};
 
 		// If the version number (excluding patch version) of the config is higher than that of the plugin,
@@ -81,27 +82,40 @@ namespace HitScoreVisualizer.Settings
 		[DefaultValue("")]
 		public string DisplayMode { get; internal set; } = string.Empty;
 
-		// If enabled, judgments will appear and stay at (fixedPosX, fixedPosY, fixedPosZ) rather than moving as normal.
-		// Additionally, the previous judgment will disappear when a new one is created (so there won't be overlap).
 		[JsonProperty("useFixedPos")]
 		[DefaultValue(false)]
+		[ShouldNotSerialize]
+		[Obsolete("Obsolete since 3.2.0. Either use the FixedPosition property or leave as null instead.")]
 		public bool UseFixedPos { get; internal set; }
 
 		[JsonProperty("fixedPosX")]
 		[DefaultValue(0f)]
+		[ShouldNotSerialize]
+		[Obsolete("Obsolete since 3.2.0. Use the FixedPosition property instead.")]
 		public float FixedPosX { get; internal set; }
 
 		[JsonProperty("fixedPosY")]
 		[DefaultValue(0f)]
+		[ShouldNotSerialize]
+		[Obsolete("Obsolete since 3.2.0. Use the FixedPosition property instead.")]
 		public float FixedPosY { get; internal set; }
 
 		[JsonProperty("fixedPosZ")]
 		[DefaultValue(0f)]
+		[ShouldNotSerialize]
+		[Obsolete("Obsolete since 3.2.0. Use the FixedPosition property instead.")]
 		public float FixedPosZ { get; internal set; }
 
-		// Only call this when this was validated beforehand
-		[JsonIgnore]
-		internal Vector3 FixedPos => new Vector3(FixedPosX, FixedPosY, FixedPosZ);
+		// If not null, judgments will appear and stay at rather than moving as normal, this will take priority over TargetPositionOffset.
+		// Additionally, the previous judgment will disappear when a new one is created (so there won't be overlap).
+		// Format changed to nullable Vector3 since version 3.2.0
+		[JsonProperty("fixedPosition", NullValueHandling = NullValueHandling.Ignore)]
+		public Vector3? FixedPosition { get; set; }
+
+		// Will offset the target position of the hitscore fade animation.
+		// If a fixed position is defined in the config, that one will take priority over this one and this will be fully ignored.
+		[JsonProperty("targetPositionOffset", NullValueHandling = NullValueHandling.Ignore)]
+		public Vector3? TargetPositionOffset { get; set; }
 
 		// If enabled, judgments will be updated more frequently. This will make score popups more accurate during a brief period before the note's score is finalized, at some cost of performance.
 		[JsonProperty("doIntermediateUpdates")]

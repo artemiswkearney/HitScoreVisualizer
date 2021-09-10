@@ -23,11 +23,18 @@ namespace HitScoreVisualizer.Models
 		{
 			_noteCutInfo = noteCutInfo;
 
-			if (_configuration?.UseFixedPos ?? false)
+			if (_configuration != null)
 			{
-				// Set current and target position to the desired fixed position
-				targetPos = _configuration!.FixedPos;
-				transform.position = targetPos;
+				if (_configuration.FixedPosition != null)
+				{
+					// Set current and target position to the desired fixed position
+					targetPos = _configuration.FixedPosition.Value;
+					transform.position = targetPos;
+				}
+				else if (_configuration.TargetPositionOffset != null)
+				{
+					targetPos += _configuration.TargetPositionOffset.Value;
+				}
 			}
 
 			_color = color;

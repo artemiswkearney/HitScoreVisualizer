@@ -51,9 +51,10 @@ namespace HitScoreVisualizer.Services
 
 			_migrationActions = new Dictionary<Version, Func<Configuration, bool>>
 			{
-				{new Version(2, 0, 0), RunMigration2_0_0},
-				{new Version(2, 1, 0), RunMigration2_1_0},
-				{new Version(2, 2, 3), RunMigration2_2_3}
+				{ new Version(2, 0, 0), RunMigration2_0_0 },
+				{ new Version(2, 1, 0), RunMigration2_1_0 },
+				{ new Version(2, 2, 3), RunMigration2_2_3 },
+				{ new Version(3, 2, 0), RunMigration3_2_0 }
 			};
 
 			_minimumMigratableVersion = _migrationActions.Keys.Min();
@@ -504,6 +505,18 @@ namespace HitScoreVisualizer.Services
 		private static bool RunMigration2_2_3(Configuration configuration)
 		{
 			configuration.DoIntermediateUpdates = true;
+
+			return true;
+		}
+
+		private static bool RunMigration3_2_0(Configuration configuration)
+		{
+#pragma warning disable 618
+			if (configuration.UseFixedPos)
+			{
+				configuration.FixedPosition = new Vector3(configuration.FixedPosX, configuration.FixedPosY, configuration.FixedPosZ);
+			}
+#pragma warning restore 618
 
 			return true;
 		}
