@@ -268,7 +268,9 @@ namespace HitScoreVisualizer.Services
 				return ConfigState.Broken;
 			}
 
-			if (configuration.Version > Plugin.Version)
+			// Both full version comparison and check on major, minor or patch version inequality in case the mod is versioned with a pre-release id
+			if (configuration.Version > Plugin.Version &&
+			    (configuration.Version.Major != Plugin.Version.Major || configuration.Version.Minor != Plugin.Version.Minor || configuration.Version.Patch != Plugin.Version.Patch))
 			{
 				LogWarning($"Config {configName} is made for a newer version of HSV than is currently installed. Targets {configuration.Version} while only {Plugin.Version} is installed");
 				return ConfigState.NewerVersion;
