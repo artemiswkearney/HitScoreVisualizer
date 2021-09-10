@@ -9,6 +9,7 @@ using HitScoreVisualizer.Settings;
 using IPA.Utilities;
 using Newtonsoft.Json;
 using SiraUtil.Tools;
+using UnityEngine;
 using Zenject;
 using Version = Hive.Versioning.Version;
 
@@ -20,6 +21,7 @@ namespace HitScoreVisualizer.Services
 		private readonly HSVConfig _hsvConfig;
 
 		private readonly string _hsvConfigsFolderPath;
+		private readonly string _hsvConfigsBackupFolderPath;
 		private readonly JsonSerializerSettings _jsonSerializerSettings;
 
 		private readonly Dictionary<Version, Func<Configuration, bool>> _migrationActions;
@@ -45,6 +47,7 @@ namespace HitScoreVisualizer.Services
 				ContractResolver = ShouldNotSerializeContractResolver.Instance
 			};
 			_hsvConfigsFolderPath = Path.Combine(UnityGame.UserDataPath, nameof(HitScoreVisualizer));
+			_hsvConfigsBackupFolderPath = Path.Combine(_hsvConfigsFolderPath, "Backups");
 
 			_migrationActions = new Dictionary<Version, Func<Configuration, bool>>
 			{
@@ -101,7 +104,8 @@ namespace HitScoreVisualizer.Services
 
 			var configFileInfo = new ConfigFileInfo(Path.GetFileNameWithoutExtension(_hsvConfig.ConfigFilePath), _hsvConfig.ConfigFilePath)
 			{
-				Configuration = userConfig, State = GetConfigState(userConfig, Path.GetFileNameWithoutExtension(_hsvConfig.ConfigFilePath))
+				Configuration = userConfig,
+				State = GetConfigState(userConfig, Path.GetFileNameWithoutExtension(_hsvConfig.ConfigFilePath), true)
 			};
 
 			await SelectUserConfig(configFileInfo).ConfigureAwait(false);
@@ -116,6 +120,7 @@ namespace HitScoreVisualizer.Services
 		{
 			var configFileInfoList = Directory
 				.EnumerateFiles(_hsvConfigsFolderPath, "*", SearchOption.AllDirectories)
+				.Where(path => !path.StartsWith(_hsvConfigsBackupFolderPath))
 				.Select(x => new ConfigFileInfo(Path.GetFileNameWithoutExtension(x), x.Substring(_hsvConfigsFolderPath.Length + 1)))
 				.ToList();
 
@@ -149,19 +154,41 @@ namespace HitScoreVisualizer.Services
 
 			if (configFileInfo.State == ConfigState.NeedsMigration)
 			{
+				var existingConfigFullPath = Path.Combine(_hsvConfigsFolderPath, configFileInfo.ConfigPath);
+				_siraLog.Logger.Notice($"Config at path '{existingConfigFullPath}' requires migration. Starting automagical config migration logic.");
+
+				// Create backups folder if it not exists
+				var backupFolderPath = Path.GetDirectoryName(Path.Combine(_hsvConfigsBackupFolderPath, configFileInfo.ConfigPath))!;
+				Directory.CreateDirectory(backupFolderPath);
+
+				var newFileName = $"{Path.GetFileNameWithoutExtension(existingConfigFullPath)} (backup of config made for {configFileInfo.Configuration!.Version})";
+				var fileExtension = Path.GetExtension(existingConfigFullPath);
+				var combinedConfigBackupPath = Path.Combine(backupFolderPath, newFileName + fileExtension);
+
+				if (File.Exists(combinedConfigBackupPath))
+				{
+					var existingFileCount = Directory.EnumerateFiles(backupFolderPath).Count(filePath => Path.GetFileNameWithoutExtension(filePath).StartsWith(newFileName));
+					newFileName += $" ({(++existingFileCount).ToString()})";
+					combinedConfigBackupPath = Path.Combine(backupFolderPath, newFileName + fileExtension);
+				}
+
+				_siraLog.Debug($"Backing up config file at '{existingConfigFullPath}' to '{combinedConfigBackupPath}'");
+				File.Copy(existingConfigFullPath, combinedConfigBackupPath);
+
 				if (configFileInfo.Configuration!.IsDefaultConfig)
 				{
+					_siraLog.Warning("Config is marked as default config and will therefore be reset to defaults");
 					configFileInfo.Configuration = Configuration.Default;
 				}
 				else
 				{
+					_siraLog.Debug("Starting actual config migration logic for config");
 					RunMigration(configFileInfo.Configuration!);
 				}
 
-				if (true)
-				{
-					await SaveConfig(configFileInfo.ConfigPath, configFileInfo.Configuration).ConfigureAwait(false);
-				}
+				await SaveConfig(configFileInfo.ConfigPath, configFileInfo.Configuration).ConfigureAwait(false);
+
+				_siraLog.Debug($"Config migration finished successfully and updated config is stored to disk at path: '{existingConfigFullPath}'");
 			}
 
 			_currentConfig = configFileInfo.Configuration;
@@ -224,29 +251,41 @@ namespace HitScoreVisualizer.Services
 			}
 		}
 
-		private ConfigState GetConfigState(Configuration? configuration, string configName)
+		private ConfigState GetConfigState(Configuration? configuration, string configName, bool shouldLogWarning = false)
 		{
+			void LogWarning(string message)
+			{
+				if (shouldLogWarning)
+				{
+					_siraLog.Warning(message);
+				}
+			}
+
 			if (configuration?.Version == null)
 			{
+				LogWarning($"Config {configName} is not recognized as a valid HSV config file");
 				return ConfigState.Broken;
 			}
 
 			if (configuration.Version > Plugin.Version)
 			{
+				LogWarning($"Config {configName} is made for a newer version of HSV than is currently installed. Targets {configuration.Version} while only {Plugin.Version} is installed");
 				return ConfigState.NewerVersion;
 			}
 
 			if (configuration.Version < _minimumMigratableVersion)
 			{
+				LogWarning($"Config {configName} is too old and cannot be migrated. Please manually update said config to a newer version of HSV");
 				return ConfigState.Incompatible;
 			}
 
-			if (!Validate(configuration!, configName))
+			if (configuration.Version < _maximumMigrationNeededVersion)
 			{
-				return ConfigState.ValidationFailed;
+				LogWarning($"Config {configName} is is made for an older version of HSV, but can be migrated (safely?). Targets {configuration.Version} while version {Plugin.Version} is installed");
+				return ConfigState.NeedsMigration;
 			}
 
-			return configuration.Version <= _maximumMigrationNeededVersion ? ConfigState.NeedsMigration : ConfigState.Compatible;
+			return !Validate(configuration, configName) ? ConfigState.ValidationFailed : ConfigState.Compatible;
 		}
 
 		// ReSharper disable once CognitiveComplexity
