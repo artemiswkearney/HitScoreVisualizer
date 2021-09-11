@@ -7,9 +7,9 @@ A fairly simple mod that allows you to heavily customize the appearance of hit s
 
 This mod requires a few other mods in order to work.
 
-- BeatSaberMarkupLanguage v1.5.4 or higher
 - BSIPA v4.2.0 or higher
-- SiraUtil v2.5.6 or higher
+- BeatSaberMarkupLanguage v1.5.5 or higher
+- SiraUtil v2.5.8 or higher
 
 The installation is fairly simple.
 
@@ -47,6 +47,11 @@ As you might have noticed, each config has a text below its name that describes 
 | NeedsMigration | Config made for HSV {Version}. Migration possible. | The config is valid, but still needs a migration to the newer format, this can be done automagically though. |
 | Compatible | OK - {Version} | The config file is just fine, nothing special needs to happen. Shows the version for which it was originally made. |
 | NewerVersion | Config is too new. Targets version {Version} | The config file is made for a newer version of HSV and therefore won't be allowed to be loaded in as it's correct workings cannot be guaranteed. |
+
+### Config migration remark
+If one of your configs needed migration upon selection. The old config will automagically be backed up to the folder `UserData\HitScoreVisualizer\Backups` (will be created if it doesn't exist) and the migrated config will be saved to the original file instead.
+However, all configs placed in that folder will **NOT** be loaded by HSV. This behavior is by-design and is intended as a safety measure, to prevent accidental migration issues with backups.
+If you want revert to a backup, move one of the files back to the main folder (or another folder in the main folder if you're using a folder structure.)
 
 
 ## How-To Config? (aka config explained)
