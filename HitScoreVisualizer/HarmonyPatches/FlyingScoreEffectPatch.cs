@@ -21,20 +21,20 @@ namespace HitScoreVisualizer.HarmonyPatches
 	[HarmonyPatch(typeof(EffectPoolsManualInstaller), nameof(EffectPoolsManualInstaller.ManualInstallBindings))]
 	internal class FlyingScoreEffectPatch
 	{
-		private static readonly MethodInfo MemoryPoolBinderMethod = typeof(DiContainer).GetMethods()
+		private static readonly MethodInfo MemoryPoolBinderOriginal = typeof(DiContainer).GetMethods()
 			.First(x => x.Name == nameof(DiContainer.BindMemoryPool) && x.IsGenericMethod && x.GetGenericArguments().Length == 2)
 			.MakeGenericMethod(typeof(FlyingScoreEffect), typeof(FlyingScoreEffect.Pool));
 
 		private static readonly MethodInfo MemoryPoolBinderReplacement = SymbolExtensions.GetMethodInfo(() => MemoryPoolBinderStub(null!));
 
 
-		private static readonly MethodInfo WithInitialSizeMethod = typeof(MemoryPoolInitialSizeMaxSizeBinder<FlyingScoreEffect>)
+		private static readonly MethodInfo WithInitialSizeOriginal = typeof(MemoryPoolInitialSizeMaxSizeBinder<FlyingScoreEffect>)
 			.GetMethod(nameof(MemoryPoolInitialSizeMaxSizeBinder<FlyingScoreEffect>.WithInitialSize), new[]
 			{
 				typeof(int)
 			})!;
 
-		private static readonly MethodInfo WithInitialSizeReplacement = SymbolExtensions.GetMethodInfo(() => WithInitialSizeStub(null!, 0));
+		private static readonly MethodInfo WithInitialSizeReplacement = SymbolExtensions.GetMethodInfo(() => PoolSizeDefinitionStub(null!, 0));
 
 		// ReSharper disable once SuggestBaseTypeForParameter
 		// ReSharper disable InconsistentNaming
@@ -74,27 +74,17 @@ namespace HitScoreVisualizer.HarmonyPatches
 		[HarmonyTranspiler]
 		internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			foreach (var codeInstruction in instructions)
-			{
-				if (codeInstruction.opcode != OpCodes.Callvirt)
-				{
-					yield return codeInstruction;
-					continue;
-				}
-
-				if (codeInstruction.Calls(MemoryPoolBinderMethod))
-				{
-					yield return new CodeInstruction(OpCodes.Callvirt, MemoryPoolBinderReplacement);
-				}
-				else if (codeInstruction.Calls(WithInitialSizeMethod))
-				{
-					yield return new CodeInstruction(OpCodes.Callvirt, WithInitialSizeReplacement);
-				}
-				else
-				{
-					yield return codeInstruction;
-				}
-			}
+			return new CodeMatcher(instructions)
+				.MatchForward(false,
+					new CodeMatch(OpCodes.Ldarg_1), // push DiContainer instance (first method parameter) onto the evaluation stack
+					new CodeMatch(OpCodes.Callvirt, MemoryPoolBinderOriginal), // Call method BindMemoryPool<,>()
+					new CodeMatch(OpCodes.Ldc_I4_S), // push InitialSize parameter with value X onto the evaluation stack
+					new CodeMatch(OpCodes.Callvirt, WithInitialSizeOriginal)) // Call method WithInitialSize(size)
+				.Advance(1)
+				.SetOperandAndAdvance(MemoryPoolBinderReplacement)
+				.Advance(1)
+				.SetOperandAndAdvance(WithInitialSizeReplacement)
+				.InstructionEnumeration();
 		}
 
 		// ReSharper disable once UnusedMethodReturnValue.Local
@@ -105,9 +95,9 @@ namespace HitScoreVisualizer.HarmonyPatches
 
 		// ReSharper disable once SuggestBaseTypeForParameter
 		// ReSharper disable once UnusedMethodReturnValue.Local
-		private static MemoryPoolMaxSizeBinder<HsvFlyingScoreEffect> WithInitialSizeStub(MemoryPoolIdInitialSizeMaxSizeBinder<HsvFlyingScoreEffect> contract, int size)
+		private static MemoryPoolMaxSizeBinder<HsvFlyingScoreEffect> PoolSizeDefinitionStub(MemoryPoolIdInitialSizeMaxSizeBinder<HsvFlyingScoreEffect> contract, int initialSize)
 		{
-			return contract.WithInitialSize(size);
+			return contract.WithInitialSize(initialSize);
 		}
 	}
 }
