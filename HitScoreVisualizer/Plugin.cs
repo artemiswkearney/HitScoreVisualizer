@@ -8,12 +8,10 @@ using IPA.Config;
 using IPA.Config.Stores;
 using IPA.Loader;
 using IPA.Logging;
-using SiraUtil.Attributes;
 using SiraUtil.Zenject;
 
 namespace HitScoreVisualizer
 {
-	[Slog]
 	[Plugin(RuntimeOptions.DynamicInit)]
 	public class Plugin
 	{
