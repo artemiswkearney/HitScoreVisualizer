@@ -5,7 +5,7 @@ using Zenject;
 
 namespace HitScoreVisualizer.Models
 {
-	internal class HsvFlyingScoreEffect : FlyingScoreEffect
+	internal sealed class HsvFlyingScoreEffect : FlyingScoreEffect
 	{
 		private JudgmentService _judgmentService = null!;
 		private Configuration? _configuration;
