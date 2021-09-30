@@ -192,8 +192,11 @@ namespace HitScoreVisualizer.Services
 				_siraLog.Debug($"Config migration finished successfully and updated config is stored to disk at path: '{existingConfigFullPath}'");
 			}
 
-			_currentConfig = configFileInfo.Configuration;
-			_hsvConfig.ConfigFilePath = configFileInfo.ConfigPath;
+			if (Validate(configFileInfo.Configuration!, configFileInfo.ConfigName))
+			{
+				_currentConfig = configFileInfo.Configuration;
+				_hsvConfig.ConfigFilePath = configFileInfo.ConfigPath;
+			}
 		}
 
 		internal void UnselectUserConfig()
