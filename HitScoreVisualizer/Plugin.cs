@@ -13,14 +13,12 @@ namespace HitScoreVisualizer
 	[Plugin(RuntimeOptions.DynamicInit)]
 	public class Plugin
 	{
-		private static PluginMetadata? _metadata;
-
-		public static Version Version => _metadata?.HVersion!;
+		internal static Version Version { get; private set; } = null!;
 
 		[Init]
 		public void Init(Logger logger, Config config, PluginMetadata pluginMetadata, Zenjector zenject)
 		{
-			_metadata = pluginMetadata;
+			Version = pluginMetadata.HVersion;
 
 			zenject.UseLogger(logger);
 			zenject.UseMetadataBinder<Plugin>();
