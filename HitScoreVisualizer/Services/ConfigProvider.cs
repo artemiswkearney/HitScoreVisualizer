@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using HitScoreVisualizer.Helpers.Json;
 using HitScoreVisualizer.Models;
 using HitScoreVisualizer.Settings;
+using IPA.Loader;
 using IPA.Utilities;
 using Newtonsoft.Json;
 using SiraUtil.Logging;
+using SiraUtil.Zenject;
 using UnityEngine;
 using Zenject;
 using Version = Hive.Versioning.Version;
@@ -19,6 +21,7 @@ namespace HitScoreVisualizer.Services
 	{
 		private readonly SiraLog _siraLog;
 		private readonly HSVConfig _hsvConfig;
+		private readonly Version _pluginVersion;
 
 		private readonly string _hsvConfigsFolderPath;
 		private readonly string _hsvConfigsBackupFolderPath;
@@ -33,10 +36,11 @@ namespace HitScoreVisualizer.Services
 
 		internal string? CurrentConfigPath => _hsvConfig.ConfigFilePath;
 
-		internal ConfigProvider(SiraLog siraLog, HSVConfig hsvConfig)
+		internal ConfigProvider(SiraLog siraLog, HSVConfig hsvConfig, UBinder<Plugin, PluginMetadata> pluginMetadata)
 		{
 			_siraLog = siraLog;
 			_hsvConfig = hsvConfig;
+			_pluginVersion = pluginMetadata.Value.HVersion;
 
 			_jsonSerializerSettings = new JsonSerializerSettings
 			{
@@ -272,10 +276,10 @@ namespace HitScoreVisualizer.Services
 			}
 
 			// Both full version comparison and check on major, minor or patch version inequality in case the mod is versioned with a pre-release id
-			if (configuration.Version > Plugin.Version &&
-			    (configuration.Version.Major != Plugin.Version.Major || configuration.Version.Minor != Plugin.Version.Minor || configuration.Version.Patch != Plugin.Version.Patch))
+			if (configuration.Version > _pluginVersion &&
+			    (configuration.Version.Major != _pluginVersion.Major || configuration.Version.Minor != _pluginVersion.Minor || configuration.Version.Patch != _pluginVersion.Patch))
 			{
-				LogWarning($"Config {configName} is made for a newer version of HSV than is currently installed. Targets {configuration.Version} while only {Plugin.Version} is installed");
+				LogWarning($"Config {configName} is made for a newer version of HSV than is currently installed. Targets {configuration.Version} while only {_pluginVersion} is installed");
 				return ConfigState.NewerVersion;
 			}
 
@@ -287,7 +291,7 @@ namespace HitScoreVisualizer.Services
 
 			if (configuration.Version < _maximumMigrationNeededVersion)
 			{
-				LogWarning($"Config {configName} is is made for an older version of HSV, but can be migrated (safely?). Targets {configuration.Version} while version {Plugin.Version} is installed");
+				LogWarning($"Config {configName} is is made for an older version of HSV, but can be migrated (safely?). Targets {configuration.Version} while version {_pluginVersion} is installed");
 				return ConfigState.NeedsMigration;
 			}
 
@@ -474,7 +478,7 @@ namespace HitScoreVisualizer.Services
 				_migrationActions[requiredMigration](userConfig);
 			}
 
-			userConfig.Version = Plugin.Version;
+			userConfig.Version = _pluginVersion;
 		}
 
 		private static bool RunMigration2_0_0(Configuration configuration)
