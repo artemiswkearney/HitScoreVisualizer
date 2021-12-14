@@ -10,14 +10,14 @@ namespace HitScoreVisualizer.UI
 	internal class HitScoreFlowCoordinator : FlowCoordinator
 	{
 		private SiraLog _siraLog = null!;
-		private UBinder<Plugin, PluginMetadata> _pluginMetadata = null!;
+		private string _pluginName = null!;
 		private ConfigSelectorViewController _configSelectorViewController = null!;
 
 		[Inject]
 		internal void Construct(SiraLog siraLog, UBinder<Plugin, PluginMetadata> pluginMetadata, ConfigSelectorViewController configSelectorViewController)
 		{
-			_pluginMetadata = pluginMetadata;
 			_siraLog = siraLog;
+			_pluginName = pluginMetadata.Value.Name;
 			_configSelectorViewController = configSelectorViewController;
 		}
 
@@ -25,7 +25,7 @@ namespace HitScoreVisualizer.UI
 		{
 			if (firstActivation)
 			{
-				SetTitle(_pluginMetadata.Value.Name);
+				SetTitle(_pluginName);
 				showBackButton = true;
 
 				ProvideInitialViewControllers(_configSelectorViewController);
