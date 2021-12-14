@@ -1,5 +1,4 @@
 ﻿using HitScoreVisualizer.UI;
-using SiraUtil;
 using Zenject;
 
 namespace HitScoreVisualizer.Installers

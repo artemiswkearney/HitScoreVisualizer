@@ -1,7 +1,7 @@
 ﻿using System;
 using BeatSaberMarkupLanguage;
 using HMUI;
-using SiraUtil.Tools;
+using SiraUtil.Logging;
 using Zenject;
 
 namespace HitScoreVisualizer.UI

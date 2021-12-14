@@ -7,6 +7,7 @@ using HitScoreVisualizer.Helpers;
 using HitScoreVisualizer.Models;
 using HitScoreVisualizer.Services;
 using IPA.Utilities;
+using SiraUtil.Affinity;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -18,15 +19,13 @@ namespace HitScoreVisualizer.HarmonyPatches
 	// https://github.com/Auros/SiraLocalizer/blob/main/SiraLocalizer/HarmonyPatches/MissedEffectSpawnerSwapper.cs
 
 	// Will most likely be rewritten once SiraUtil 3 becomes available
-	[HarmonyPatch(typeof(EffectPoolsManualInstaller), nameof(EffectPoolsManualInstaller.ManualInstallBindings))]
-	internal class FlyingScoreEffectPatch
+	internal class FlyingScoreEffectPatch : IAffinity
 	{
 		private static readonly MethodInfo MemoryPoolBinderOriginal = typeof(DiContainer).GetMethods()
 			.First(x => x.Name == nameof(DiContainer.BindMemoryPool) && x.IsGenericMethod && x.GetGenericArguments().Length == 2)
 			.MakeGenericMethod(typeof(FlyingScoreEffect), typeof(FlyingScoreEffect.Pool));
 
 		private static readonly MethodInfo MemoryPoolBinderReplacement = SymbolExtensions.GetMethodInfo(() => MemoryPoolBinderStub(null!));
-
 
 		private static readonly MethodInfo WithInitialSizeOriginal = typeof(MemoryPoolInitialSizeMaxSizeBinder<FlyingScoreEffect>)
 			.GetMethod(nameof(MemoryPoolInitialSizeMaxSizeBinder<FlyingScoreEffect>.WithInitialSize), new[]
@@ -36,10 +35,18 @@ namespace HitScoreVisualizer.HarmonyPatches
 
 		private static readonly MethodInfo WithInitialSizeReplacement = SymbolExtensions.GetMethodInfo(() => PoolSizeDefinitionStub(null!, 0));
 
+		private readonly BloomFontProvider _bloomFontProvider;
+
+		public FlyingScoreEffectPatch(BloomFontProvider bloomFontProvider)
+		{
+			_bloomFontProvider = bloomFontProvider;
+		}
+
 		// ReSharper disable once SuggestBaseTypeForParameter
 		// ReSharper disable InconsistentNaming
-		[HarmonyPrefix]
-		internal static void Prefix(FlyingScoreEffect ____flyingScoreEffectPrefab, DiContainer container)
+		[AffinityPrefix]
+		[AffinityPatch(typeof(EffectPoolsManualInstaller), nameof(EffectPoolsManualInstaller.ManualInstallBindings))]
+		internal void Prefix(FlyingScoreEffect ____flyingScoreEffectPrefab)
 		{
 			var gameObject = ____flyingScoreEffectPrefab.gameObject;
 
@@ -68,11 +75,12 @@ namespace HitScoreVisualizer.HarmonyPatches
 			}
 
 			// Once the HSV stuff is done, we reconfigure the HSV prefab font.
-			container.Resolve<BloomFontProvider>().ConfigureFont(ref text);
+			_bloomFontProvider.ConfigureFont(ref text);
 		}
 
-		[HarmonyTranspiler]
-		internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		[AffinityTranspiler]
+		[AffinityPatch(typeof(EffectPoolsManualInstaller), nameof(EffectPoolsManualInstaller.ManualInstallBindings))]
+		internal IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			return new CodeMatcher(instructions)
 				.MatchForward(false,

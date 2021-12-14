@@ -10,7 +10,7 @@ using HitScoreVisualizer.Services;
 using HitScoreVisualizer.Settings;
 using HMUI;
 using IPA.Utilities.Async;
-using SiraUtil.Tools;
+using SiraUtil.Logging;
 using Zenject;
 
 namespace HitScoreVisualizer.UI
@@ -98,7 +98,7 @@ namespace HitScoreVisualizer.UI
 				{
 					if (customListTableData == null)
 					{
-						_siraLog.Warning($"{nameof(customListTableData)} is null.");
+						_siraLog.Warn($"{nameof(customListTableData)} is null.");
 						return;
 					}
 
@@ -152,7 +152,7 @@ namespace HitScoreVisualizer.UI
 		{
 			if (customListTableData == null)
 			{
-				_siraLog.Warning($"{nameof(customListTableData)} is null.");
+				_siraLog.Warn($"{nameof(customListTableData)} is null.");
 				return;
 			}
 

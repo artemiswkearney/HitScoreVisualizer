@@ -1,5 +1,3 @@
-using HarmonyLib;
-using HitScoreVisualizer.HarmonyPatches;
 using HitScoreVisualizer.Installers;
 using HitScoreVisualizer.Settings;
 using Hive.Versioning;
@@ -15,9 +13,6 @@ namespace HitScoreVisualizer
 	[Plugin(RuntimeOptions.DynamicInit)]
 	public class Plugin
 	{
-		private const string HARMONY_ID = "be.erisapps.HitScoreVisualizer";
-
-		private static Harmony? _harmonyInstance;
 		private static PluginMetadata? _metadata;
 
 		public static string Name => _metadata?.Name!;
@@ -28,22 +23,15 @@ namespace HitScoreVisualizer
 		{
 			_metadata = pluginMetadata;
 
-			zenject.OnApp<HsvAppInstaller>().WithParameters(logger, config.Generated<HSVConfig>());
-			zenject.OnMenu<HsvMenuInstaller>();
-			zenject.OnGame<HsvGameInstaller>();
+			zenject.UseLogger(logger);
+			zenject.Install<HsvAppInstaller>(Location.App, config.Generated<HSVConfig>());
+			zenject.Install<HsvMenuInstaller>(Location.Menu);
+			zenject.Install<HsvGameInstaller>(Location.Player);
 		}
 
-		[OnEnable]
-		public void OnEnable()
+		[OnEnable, OnDisable]
+		public void OnStateChanged()
 		{
-			_harmonyInstance = Harmony.CreateAndPatchAll(typeof(FlyingScoreEffectPatch), HARMONY_ID);
-		}
-
-		[OnDisable]
-		public void OnDisable()
-		{
-			_harmonyInstance?.UnpatchSelf();
-			_harmonyInstance = null;
 		}
 	}
 }

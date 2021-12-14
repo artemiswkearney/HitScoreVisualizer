@@ -8,7 +8,7 @@ using HitScoreVisualizer.Models;
 using HitScoreVisualizer.Settings;
 using IPA.Utilities;
 using Newtonsoft.Json;
-using SiraUtil.Tools;
+using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
 using Version = Hive.Versioning.Version;
@@ -79,7 +79,7 @@ namespace HitScoreVisualizer.Services
 					}
 					catch (Exception e)
 					{
-						_siraLog.Warning(e);
+						_siraLog.Warn(e);
 					}
 				}
 			}
@@ -99,7 +99,7 @@ namespace HitScoreVisualizer.Services
 			var userConfig = await LoadConfig(_hsvConfig.ConfigFilePath).ConfigureAwait(false);
 			if (userConfig == null)
 			{
-				_siraLog.Warning($"Couldn't load userConfig at {fullPath}");
+				_siraLog.Warn($"Couldn't load userConfig at {fullPath}");
 				return;
 			}
 
@@ -156,7 +156,7 @@ namespace HitScoreVisualizer.Services
 			if (configFileInfo.State == ConfigState.NeedsMigration)
 			{
 				var existingConfigFullPath = Path.Combine(_hsvConfigsFolderPath, configFileInfo.ConfigPath);
-				_siraLog.Logger.Notice($"Config at path '{existingConfigFullPath}' requires migration. Starting automagical config migration logic.");
+				_siraLog.Notice($"Config at path '{existingConfigFullPath}' requires migration. Starting automagical config migration logic.");
 
 				// Create backups folder if it not exists
 				var backupFolderPath = Path.GetDirectoryName(Path.Combine(_hsvConfigsBackupFolderPath, configFileInfo.ConfigPath))!;
@@ -178,7 +178,7 @@ namespace HitScoreVisualizer.Services
 
 				if (configFileInfo.Configuration!.IsDefaultConfig)
 				{
-					_siraLog.Warning("Config is marked as default config and will therefore be reset to defaults");
+					_siraLog.Warn("Config is marked as default config and will therefore be reset to defaults");
 					configFileInfo.Configuration = Configuration.Default;
 				}
 				else
@@ -226,7 +226,7 @@ namespace HitScoreVisualizer.Services
 			}
 			catch (Exception ex)
 			{
-				_siraLog.Warning(ex);
+				_siraLog.Warn(ex);
 				// Expected behaviour when file isn't an actual hsv config file...
 				return null;
 			}
@@ -261,7 +261,7 @@ namespace HitScoreVisualizer.Services
 			{
 				if (shouldLogWarning)
 				{
-					_siraLog.Warning(message);
+					_siraLog.Warn(message);
 				}
 			}
 
@@ -299,7 +299,7 @@ namespace HitScoreVisualizer.Services
 		{
 			if (!configuration.Judgments?.Any() ?? true)
 			{
-				_siraLog.Warning($"No judgments found for {configName}");
+				_siraLog.Warn($"No judgments found for {configName}");
 				return false;
 			}
 
@@ -311,13 +311,13 @@ namespace HitScoreVisualizer.Services
 			// 99 is the max for NumberFormatInfo.NumberDecimalDigits
 			if (configuration.TimeDependenceDecimalPrecision < 0 || configuration.TimeDependenceDecimalPrecision > 99)
 			{
-				_siraLog.Warning($"timeDependencyDecimalPrecision value {configuration.TimeDependenceDecimalPrecision} is outside the range of acceptable values [0, 99]");
+				_siraLog.Warn($"timeDependencyDecimalPrecision value {configuration.TimeDependenceDecimalPrecision} is outside the range of acceptable values [0, 99]");
 				return false;
 			}
 
 			if (configuration.TimeDependenceDecimalOffset < 0 || configuration.TimeDependenceDecimalOffset > Math.Log10(float.MaxValue))
 			{
-				_siraLog.Warning($"timeDependencyDecimalOffset value {configuration.TimeDependenceDecimalOffset} is outside the range of acceptable values [0, {(int) Math.Log10(float.MaxValue)}]");
+				_siraLog.Warn($"timeDependencyDecimalOffset value {configuration.TimeDependenceDecimalOffset} is outside the range of acceptable values [0, {(int) Math.Log10(float.MaxValue)}]");
 				return false;
 			}
 
@@ -372,7 +372,7 @@ namespace HitScoreVisualizer.Services
 
 			if (!ValidateJudgmentColor(prevJudgement, configName))
 			{
-				_siraLog.Warning($"Judgment entry for threshold {prevJudgement.Threshold} has invalid color in {configName}");
+				_siraLog.Warn($"Judgment entry for threshold {prevJudgement.Threshold} has invalid color in {configName}");
 				return false;
 			}
 
@@ -385,7 +385,7 @@ namespace HitScoreVisualizer.Services
 					{
 						if (!ValidateJudgmentColor(currentJudgement, configName))
 						{
-							_siraLog.Warning($"Judgment entry for threshold {currentJudgement.Threshold} has invalid color in {configName}");
+							_siraLog.Warn($"Judgment entry for threshold {currentJudgement.Threshold} has invalid color in {configName}");
 							return false;
 						}
 
@@ -393,7 +393,7 @@ namespace HitScoreVisualizer.Services
 						continue;
 					}
 
-					_siraLog.Warning($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
+					_siraLog.Warn($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
 					return false;
 				}
 			}
@@ -405,7 +405,7 @@ namespace HitScoreVisualizer.Services
 		{
 			if (judgment.Color.Count != 4)
 			{
-				_siraLog.Warning($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers for each judgment's color!");
+				_siraLog.Warn($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers for each judgment's color!");
 				return false;
 			}
 
@@ -414,7 +414,7 @@ namespace HitScoreVisualizer.Services
 				return true;
 			}
 
-			_siraLog.Warning($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers that are greater or equal than 0 (and preferably smaller or equal than 1) for each judgment's color!");
+			_siraLog.Warn($"Judgment for threshold {judgment.Threshold} has invalid color in {configName}! Make sure to include exactly 4 numbers that are greater or equal than 0 (and preferably smaller or equal than 1) for each judgment's color!");
 			return false;
 		}
 
@@ -435,7 +435,7 @@ namespace HitScoreVisualizer.Services
 					continue;
 				}
 
-				_siraLog.Warning($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
+				_siraLog.Warn($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
 				return false;
 			}
 
@@ -459,7 +459,7 @@ namespace HitScoreVisualizer.Services
 					continue;
 				}
 
-				_siraLog.Warning($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
+				_siraLog.Warn($"Duplicate entry found for threshold {currentJudgement.Threshold} in {configName}");
 				return false;
 			}
 
@@ -532,7 +532,7 @@ namespace HitScoreVisualizer.Services
 			{
 				if (!calledOnInit)
 				{
-					_siraLog.Warning("*sigh* Don't yeet the HSV configs folder while the game is running... Recreating it again...");
+					_siraLog.Warn("*sigh* Don't yeet the HSV configs folder while the game is running... Recreating it again...");
 				}
 
 				Directory.CreateDirectory(_hsvConfigsFolderPath);
