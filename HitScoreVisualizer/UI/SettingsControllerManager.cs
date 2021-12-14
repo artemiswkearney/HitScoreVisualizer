@@ -1,20 +1,25 @@
 ﻿using System;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.MenuButtons;
+using IPA.Loader;
+using SiraUtil.Zenject;
 using Zenject;
 
 namespace HitScoreVisualizer.UI
 {
 	internal class SettingsControllerManager : IInitializable, IDisposable
 	{
+		private readonly UBinder<Plugin, PluginMetadata> _pluginMetadata;
 		private readonly HitScoreFlowCoordinator _hitScoreFlowCoordinator;
+
 		private MenuButton? _hsvButton;
 
-		[Inject]
-		public SettingsControllerManager(HitScoreFlowCoordinator hitScoreFlowCoordinator)
+		public SettingsControllerManager(UBinder<Plugin, PluginMetadata> pluginMetadata, HitScoreFlowCoordinator hitScoreFlowCoordinator)
 		{
+			_pluginMetadata = pluginMetadata;
 			_hitScoreFlowCoordinator = hitScoreFlowCoordinator;
-			_hsvButton = new MenuButton($"<size=89.5%>{Plugin.Name}", "Select the config you want.", OnClick);
+
+			_hsvButton = new MenuButton($"<size=89.5%>{_pluginMetadata.Value.Name}", "Select the config you want.", OnClick);
 		}
 
 		public void Initialize()

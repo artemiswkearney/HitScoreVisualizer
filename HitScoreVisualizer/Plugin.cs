@@ -15,7 +15,6 @@ namespace HitScoreVisualizer
 	{
 		private static PluginMetadata? _metadata;
 
-		public static string Name => _metadata?.Name!;
 		public static Version Version => _metadata?.HVersion!;
 
 		[Init]
@@ -24,6 +23,8 @@ namespace HitScoreVisualizer
 			_metadata = pluginMetadata;
 
 			zenject.UseLogger(logger);
+			zenject.UseMetadataBinder<Plugin>();
+
 			zenject.Install<HsvAppInstaller>(Location.App, config.Generated<HSVConfig>());
 			zenject.Install<HsvMenuInstaller>(Location.Menu);
 			zenject.Install<HsvGameInstaller>(Location.Player);

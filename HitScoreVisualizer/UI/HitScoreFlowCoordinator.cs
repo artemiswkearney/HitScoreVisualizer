@@ -1,7 +1,8 @@
-﻿using System;
-using BeatSaberMarkupLanguage;
+﻿using BeatSaberMarkupLanguage;
 using HMUI;
+using IPA.Loader;
 using SiraUtil.Logging;
+using SiraUtil.Zenject;
 using Zenject;
 
 namespace HitScoreVisualizer.UI
@@ -9,29 +10,25 @@ namespace HitScoreVisualizer.UI
 	internal class HitScoreFlowCoordinator : FlowCoordinator
 	{
 		private SiraLog _siraLog = null!;
-		private ConfigSelectorViewController? _configSelectorViewController;
+		private UBinder<Plugin, PluginMetadata> _pluginMetadata = null!;
+		private ConfigSelectorViewController _configSelectorViewController = null!;
 
 		[Inject]
-		internal void Construct(SiraLog siraLog, ConfigSelectorViewController configSelectorViewController)
+		internal void Construct(SiraLog siraLog, UBinder<Plugin, PluginMetadata> pluginMetadata, ConfigSelectorViewController configSelectorViewController)
 		{
+			_pluginMetadata = pluginMetadata;
 			_siraLog = siraLog;
 			_configSelectorViewController = configSelectorViewController;
 		}
 
 		protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 		{
-			try
+			if (firstActivation)
 			{
-				if (firstActivation)
-				{
-					SetTitle(Plugin.Name);
-					showBackButton = true;
-					ProvideInitialViewControllers(_configSelectorViewController);
-				}
-			}
-			catch (Exception ex)
-			{
-				_siraLog.Error(ex);
+				SetTitle(_pluginMetadata.Value.Name);
+				showBackButton = true;
+
+				ProvideInitialViewControllers(_configSelectorViewController);
 			}
 		}
 
