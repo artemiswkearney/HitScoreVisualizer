@@ -10,7 +10,7 @@ using SiraUtil.Zenject;
 
 namespace HitScoreVisualizer
 {
-	[Plugin(RuntimeOptions.DynamicInit)]
+	[Plugin(RuntimeOptions.DynamicInit), NoEnableDisable]
 	public class Plugin
 	{
 		internal static Version Version { get; private set; } = null!;
@@ -26,11 +26,6 @@ namespace HitScoreVisualizer
 			zenject.Install<HsvAppInstaller>(Location.App, config.Generated<HSVConfig>());
 			zenject.Install<HsvMenuInstaller>(Location.Menu);
 			zenject.Install<HsvGameInstaller>(Location.Player);
-		}
-
-		[OnEnable, OnDisable]
-		public void OnStateChanged()
-		{
 		}
 	}
 }
