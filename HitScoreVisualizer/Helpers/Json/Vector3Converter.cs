@@ -16,7 +16,7 @@ namespace HitScoreVisualizer.Helpers.Json
 			var t = serializer.Deserialize(reader);
 			if (t == null)
 			{
-				return objectType == typeof(Vector3) ? default(Vector3) : (Vector3?) null!;
+				return objectType == typeof(Vector3) ? default(Vector3) : null!;
 			}
 
 			return JsonConvert.DeserializeObject<Vector3>(t.ToString());
