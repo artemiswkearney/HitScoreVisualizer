@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
 		<OutputType>Library</OutputType>
-		<LangVersion>8</LangVersion>
+		<LangVersion>9</LangVersion>
 		<Nullable>enable</Nullable>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<LocalRefsDir Condition="Exists('..\Refs')">..\Refs</LocalRefsDir>
