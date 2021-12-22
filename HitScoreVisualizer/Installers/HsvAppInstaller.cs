@@ -19,6 +19,8 @@ namespace HitScoreVisualizer.Installers
 			Container.BindInstance(_hsvConfig);
 			Container.BindInterfacesAndSelfTo<ConfigProvider>().AsSingle();
 			Container.BindInterfacesAndSelfTo<BloomFontProvider>().AsSingle();
+			Container.Bind<JudgmentService>().AsSingle();
+
 			Container.BindInterfacesTo<FlyingScoreEffectPatch>().AsSingle();
 		}
 	}
