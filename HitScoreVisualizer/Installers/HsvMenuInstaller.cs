@@ -3,7 +3,7 @@ using Zenject;
 
 namespace HitScoreVisualizer.Installers
 {
-	internal class HsvMenuInstaller : Installer<HsvMenuInstaller>
+	internal sealed class HsvMenuInstaller : Installer
 	{
 		public override void InstallBindings()
 		{

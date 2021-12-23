@@ -25,6 +25,7 @@ namespace HitScoreVisualizer
 
 			zenject.Install<HsvAppInstaller>(Location.App, config.Generated<HSVConfig>());
 			zenject.Install<HsvMenuInstaller>(Location.Menu);
+			zenject.Install<HsvGameInstaller>(Location.Tutorial | Location.Player);
 		}
 	}
 }
