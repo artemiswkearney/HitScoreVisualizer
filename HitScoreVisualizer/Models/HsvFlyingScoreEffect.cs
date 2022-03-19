@@ -1,4 +1,4 @@
-﻿using HitScoreVisualizer.Services;
+using HitScoreVisualizer.Services;
 using HitScoreVisualizer.Settings;
 using UnityEngine;
 using Zenject;
@@ -19,9 +19,9 @@ namespace HitScoreVisualizer.Models
 			_configuration = configProvider.GetCurrentConfig();
 		}
 
-		public override void InitAndPresent(in NoteCutInfo noteCutInfo, int multiplier, float duration, Vector3 targetPos, Quaternion rotation, Color color)
+		public override void InitAndPresent(IReadonlyCutScoreBuffer cutScoreBuffer, float duration, Vector3 targetPos, Color color)
 		{
-			_noteCutInfo = noteCutInfo;
+			_noteCutInfo = cutScoreBuffer.noteCutInfo;
 
 			if (_configuration != null)
 			{
@@ -38,28 +38,29 @@ namespace HitScoreVisualizer.Models
 			}
 
 			_color = color;
-			_saberSwingRatingCounter = noteCutInfo.swingRatingCounter;
-			_cutDistanceToCenter = noteCutInfo.cutDistanceToCenter;
-			_saberSwingRatingCounter.RegisterDidChangeReceiver(this);
-			_saberSwingRatingCounter.RegisterDidFinishReceiver(this);
-			_registeredToCallbacks = true;
+			_cutScoreBuffer = cutScoreBuffer;
+			if (!cutScoreBuffer.isFinished)
+			{
+				cutScoreBuffer.RegisterDidChangeReceiver(this);
+				cutScoreBuffer.RegisterDidFinishReceiver(this);
+				_registeredToCallbacks = true;
+			}
 
 			if (_configuration == null)
 			{
-				ScoreModel.RawScoreWithoutMultiplier(_saberSwingRatingCounter, _cutDistanceToCenter, out var beforeCutRawScore, out var afterCutRawScore, out var cutDistanceRawScore);
-				_text.text = GetScoreText(beforeCutRawScore + afterCutRawScore);
-				_maxCutDistanceScoreIndicator.enabled = cutDistanceRawScore == 15;
-				_colorAMultiplier = beforeCutRawScore + afterCutRawScore > 103.5 ? 1f : 0.3f;
+				_text.text = cutScoreBuffer.cutScore.ToString();
+				_maxCutDistanceScoreIndicator.enabled = cutScoreBuffer.centerDistanceCutScore == cutScoreBuffer.noteScoreDefinition.maxCenterDistanceCutScore;
+				_colorAMultiplier = (double) cutScoreBuffer.cutScore > (double) cutScoreBuffer.maxPossibleCutScore * 0.899999976158142 ? 1f : 0.3f;
 			}
 			else
 			{
 				_maxCutDistanceScoreIndicator.enabled = false;
 
 				// Apply judgments a total of twice - once when the effect is created, once when it finishes.
-				Judge(_noteCutInfo.Value.swingRatingCounter, 30);
+				Judge((CutScoreBuffer) cutScoreBuffer, 30);
 			}
 
-			InitAndPresent(duration, targetPos, rotation, false);
+			InitAndPresent(duration, targetPos, cutScoreBuffer.noteCutInfo.worldRotation, false);
 		}
 
 		protected override void ManualUpdate(float t)
@@ -69,37 +70,38 @@ namespace HitScoreVisualizer.Models
 			_maxCutDistanceScoreIndicator.color = color;
 		}
 
-		public override void HandleSaberSwingRatingCounterDidChange(ISaberSwingRatingCounter swingRatingCounter, float rating)
+		public override void HandleCutScoreBufferDidChange(CutScoreBuffer cutScoreBuffer)
 		{
 			if (_configuration == null)
 			{
-				base.HandleSaberSwingRatingCounterDidChange(swingRatingCounter, rating);
+				base.HandleCutScoreBufferDidChange(cutScoreBuffer);
 				return;
 			}
 
 			if (_configuration.DoIntermediateUpdates)
 			{
-				Judge(swingRatingCounter);
+				Judge(cutScoreBuffer);
 			}
 		}
 
-		public override void HandleSaberSwingRatingCounterDidFinish(ISaberSwingRatingCounter saberSwingRatingCounter)
+		public override void HandleCutScoreBufferDidFinish(CutScoreBuffer cutScoreBuffer)
 		{
 			if (_configuration != null)
 			{
-				Judge(saberSwingRatingCounter);
+				Judge(cutScoreBuffer);
 			}
 
-			base.HandleSaberSwingRatingCounterDidFinish(saberSwingRatingCounter);
+			base.HandleCutScoreBufferDidFinish(cutScoreBuffer);
 		}
 
-		private void Judge(ISaberSwingRatingCounter swingRatingCounter, int? assumedAfterCutScore = null)
+		private void Judge(CutScoreBuffer cutScoreBuffer, int? assumedAfterCutScore = null)
 		{
-			ScoreModel.RawScoreWithoutMultiplier(swingRatingCounter, _cutDistanceToCenter, out var before, out var after, out var accuracy);
-			after = assumedAfterCutScore ?? after;
+			var before = cutScoreBuffer.beforeCutScore;
+			var after = assumedAfterCutScore ?? cutScoreBuffer.afterCutScore;
+			var accuracy = cutScoreBuffer.centerDistanceCutScore;
 			var total = before + after + accuracy;
 			var timeDependence = Mathf.Abs(_noteCutInfo!.Value.cutNormal.z);
-			_judgmentService.Judge(ref _text, ref _color, total, before, after, accuracy, timeDependence);
+			_judgmentService.Judge(cutScoreBuffer.noteScoreDefinition, ref _text, ref _color, total, before, after, accuracy, timeDependence);
 		}
 	}
 }
