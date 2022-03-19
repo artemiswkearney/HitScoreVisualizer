@@ -16,7 +16,7 @@ namespace HitScoreVisualizer.Services
 			_config = configProvider.GetCurrentConfig();
 		}
 
-		internal void Judge(ref TextMeshPro text, ref Color color, int score, int before, int after, int accuracy, float timeDependence)
+		internal void Judge(ScoreModel.NoteScoreDefinition noteScoreDefinition, ref TextMeshPro text, ref Color color, int score, int before, int after, int accuracy, float timeDependence)
 		{
 			if (_config == null)
 			{
@@ -48,7 +48,7 @@ namespace HitScoreVisualizer.Services
 
 			text.text = _config.DisplayMode switch
 			{
-				"format" => DisplayModeFormat(score, before, after, accuracy, timeDependence, judgment, _config),
+				"format" => DisplayModeFormat(noteScoreDefinition, score, before, after, accuracy, timeDependence, judgment, _config),
 				"textOnly" => judgment.Text,
 				"numeric" => score.ToString(),
 				"scoreOnTop" => $"{score}\n{judgment.Text}\n",
@@ -57,7 +57,7 @@ namespace HitScoreVisualizer.Services
 		}
 
 		// ReSharper disable once CognitiveComplexity
-		private static string DisplayModeFormat(int score, int before, int after, int accuracy, float timeDependence, Judgment judgment, Configuration instance)
+		private static string DisplayModeFormat(ScoreModel.NoteScoreDefinition noteScoreDefinition, int score, int before, int after, int accuracy, float timeDependence, Judgment judgment, Configuration instance)
 		{
 			var formattedBuilder = new StringBuilder();
 			var formatString = judgment.Text;
@@ -102,7 +102,7 @@ namespace HitScoreVisualizer.Services
 						formattedBuilder.Append(score);
 						break;
 					case 'p':
-						formattedBuilder.Append($"{(double) score / ScoreModel.kMaxCutRawScore * 100:0}");
+						formattedBuilder.Append($"{(double) score / noteScoreDefinition.maxCutScore * 100:0}");
 						break;
 					case '%':
 						formattedBuilder.Append("%");
